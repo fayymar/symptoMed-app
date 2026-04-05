@@ -45,7 +45,7 @@ export const SymptomsPage: FC = () => {
             size="l"
             stretched
             disabled={symptoms.trim().length === 0}
-            onClick={() => navigate('/loading')}
+            onClick={() => navigate('/questions')}
           >
             Далее
           </Button>
