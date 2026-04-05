@@ -1,33 +1,41 @@
-import { useState, type FC } from 'react';
+import { useState, useEffect, type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
-
-const MOCK_QUESTIONS = [
-  {
-    question: 'Как бы вы описали боль?',
-    options: ['Острая, резкая', 'Тупая, ноющая', 'Пульсирующая', 'Жжение', 'Давящая'],
-  },
-  {
-    question: 'Боль усиливается при движении?',
-    options: ['Да, значительно', 'Немного', 'Нет', 'Затрудняюсь ответить'],
-  },
-  {
-    question: 'Есть ли сопутствующие симптомы?',
-    options: ['Тошнота', 'Головокружение', 'Слабость', 'Температура', 'Нет'],
-  },
-];
+import { sendAnswer, type Question } from '@/api/consultation.ts';
 
 export const QuestionsPage: FC = () => {
   const navigate = useNavigate();
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [loading, setLoading] = useState(false);
 
-  const current = MOCK_QUESTIONS[currentIndex];
-  const progress = ((currentIndex + 1) / MOCK_QUESTIONS.length) * 100;
+  useEffect(() => {
+    const stored = localStorage.getItem('symptoMed_questions');
+    if (stored) {
+      setQuestions(JSON.parse(stored));
+    } else {
+      navigate('/');
+    }
+  }, [navigate]);
 
-  const handleAnswer = () => {
-    if (currentIndex < MOCK_QUESTIONS.length - 1) {
+  if (questions.length === 0) return null;
+
+  const current = questions[currentIndex];
+  const progress = ((currentIndex + 1) / questions.length) * 100;
+
+  const handleAnswer = async (answer: string) => {
+    const sessionId = localStorage.getItem('symptoMed_sessionId') ?? '';
+    setLoading(true);
+    try {
+      await sendAnswer(sessionId, currentIndex, answer);
+    } catch {
+      // Continue navigation even if API fails
+    } finally {
+      setLoading(false);
+    }
+    if (currentIndex < questions.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
       navigate('/duration');
@@ -64,7 +72,7 @@ export const QuestionsPage: FC = () => {
           color: 'var(--tg-theme-hint-color, #999)',
           marginBottom: 8,
         }}>
-          Вопрос {currentIndex + 1} из {MOCK_QUESTIONS.length}
+          Вопрос {currentIndex + 1} из {questions.length}
         </div>
         <div style={{
           fontSize: 20,
@@ -73,7 +81,7 @@ export const QuestionsPage: FC = () => {
           marginBottom: 24,
           lineHeight: 1.4,
         }}>
-          {current.question}
+          {current.text}
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
@@ -83,7 +91,8 @@ export const QuestionsPage: FC = () => {
               size="m"
               stretched
               mode="outline"
-              onClick={handleAnswer}
+              disabled={loading}
+              onClick={() => handleAnswer(option)}
             >
               {option}
             </Button>
@@ -95,7 +104,8 @@ export const QuestionsPage: FC = () => {
             size="m"
             stretched
             mode="plain"
-            onClick={handleAnswer}
+            disabled={loading}
+            onClick={() => handleAnswer('Другое')}
           >
             Написать своё
           </Button>

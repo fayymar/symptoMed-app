@@ -1,8 +1,9 @@
-import type { FC } from 'react';
+import { useState, type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
+import { sendDuration } from '@/api/consultation.ts';
 
 const DURATIONS = [
   'Сегодня',
@@ -14,6 +15,20 @@ const DURATIONS = [
 
 export const DurationPage: FC = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  const handleDuration = async (duration: string) => {
+    const sessionId = localStorage.getItem('symptoMed_sessionId') ?? '';
+    setLoading(true);
+    try {
+      await sendDuration(sessionId, duration);
+    } catch {
+      // Continue navigation even if API fails
+    } finally {
+      setLoading(false);
+    }
+    navigate('/result');
+  };
 
   return (
     <Page back={true}>
@@ -47,7 +62,8 @@ export const DurationPage: FC = () => {
               size="l"
               stretched
               mode="outline"
-              onClick={() => navigate('/result')}
+              disabled={loading}
+              onClick={() => handleDuration(duration)}
             >
               {duration}
             </Button>

@@ -3,10 +3,28 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Textarea } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
+import { startConsultation } from '@/api/consultation.ts';
 
 export const SymptomsPage: FC = () => {
   const navigate = useNavigate();
   const [symptoms, setSymptoms] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleNext = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const data = await startConsultation(1, symptoms);
+      localStorage.setItem('symptoMed_sessionId', data.sessionId);
+      localStorage.setItem('symptoMed_questions', JSON.stringify(data.questions));
+      navigate('/questions');
+    } catch {
+      setError('Ошибка соединения. Попробуйте снова.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Page back={true}>
@@ -40,14 +58,25 @@ export const SymptomsPage: FC = () => {
           style={{ flex: 1, minHeight: 180 }}
         />
 
+        {error && (
+          <div style={{
+            marginTop: 12,
+            fontSize: 14,
+            color: '#ec3942',
+            textAlign: 'center',
+          }}>
+            {error}
+          </div>
+        )}
+
         <div style={{ paddingTop: 24, paddingBottom: 32 }}>
           <Button
             size="l"
             stretched
-            disabled={symptoms.trim().length === 0}
-            onClick={() => navigate('/questions')}
+            disabled={symptoms.trim().length === 0 || loading}
+            onClick={handleNext}
           >
-            Далее
+            {loading ? 'Загрузка...' : 'Далее'}
           </Button>
         </div>
       </div>
