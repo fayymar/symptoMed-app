@@ -1,11 +1,19 @@
 import type { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@telegram-apps/telegram-ui';
+import { useInitData } from '@tma.js/sdk-react';
 
 import { Page } from '@/components/Page.tsx';
 
 export const HomePage: FC = () => {
   const navigate = useNavigate();
+  const initData = useInitData();
+  const userId = initData?.user?.id;
+
+  const handleAppleWatch = () => {
+    const link = `shortcuts://run-shortcut?name=СимптоМед Пульс&input=${userId}`;
+    window.open(link);
+  };
 
   return (
     <Page back={false}>
@@ -59,6 +67,30 @@ export const HomePage: FC = () => {
           >
             История консультаций
           </Button>
+          <Button
+            size="l"
+            stretched
+            mode="outline"
+            onClick={() => navigate('/heartrate')}
+          >
+            ❤️ История пульса
+          </Button>
+          <Button
+            size="l"
+            stretched
+            mode="outline"
+            onClick={handleAppleWatch}
+          >
+            ⌚ Подключить Apple Watch
+          </Button>
+          <div style={{
+            fontSize: 13,
+            color: 'var(--tg-theme-hint-color, #999)',
+            textAlign: 'center',
+            lineHeight: 1.5,
+          }}>
+            Нажмите чтобы установить Shortcut для Apple Watch. После установки запускайте его для отправки пульса.
+          </div>
         </div>
       </div>
     </Page>

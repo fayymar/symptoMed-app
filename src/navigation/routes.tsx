@@ -6,6 +6,7 @@ import { QuestionsPage } from '@/pages/QuestionsPage.tsx';
 import { DurationPage } from '@/pages/DurationPage.tsx';
 import { ResultPage } from '@/pages/ResultPage.tsx';
 import { LoadingPage } from '@/pages/LoadingPage.tsx';
+import { HeartratePage } from '@/pages/HeartratePage.tsx';
 
 interface Route {
   path: string;
@@ -19,4 +20,5 @@ export const routes: Route[] = [
   { path: '/duration', Component: DurationPage },
   { path: '/result', Component: ResultPage },
   { path: '/loading', Component: LoadingPage },
+  { path: '/heartrate', Component: HeartratePage },
 ];
