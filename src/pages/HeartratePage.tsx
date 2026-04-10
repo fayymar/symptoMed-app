@@ -1,6 +1,6 @@
 import { useState, useEffect, type FC } from 'react';
 import { Section, Cell, List } from '@telegram-apps/telegram-ui';
-import { useInitData } from '@tma.js/sdk-react';
+import { useRawInitData } from '@tma.js/sdk-react';
 
 import { Page } from '@/components/Page.tsx';
 
@@ -23,8 +23,15 @@ function getLabel(value: number): string {
 }
 
 export const HeartratePage: FC = () => {
-  const initData = useInitData();
-  const userId = initData?.user?.id;
+  const rawInitData = useRawInitData();
+  const userId = (() => {
+    if (!rawInitData) return undefined;
+    try {
+      return JSON.parse(new URLSearchParams(rawInitData).get('user') ?? '')?.id;
+    } catch {
+      return undefined;
+    }
+  })();
 
   const [entries, setEntries] = useState<HeartrateEntry[]>([]);
   const [loading, setLoading] = useState(true);
