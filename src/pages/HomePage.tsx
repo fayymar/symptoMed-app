@@ -1,24 +1,22 @@
 import type { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@telegram-apps/telegram-ui';
-import { useRawInitData } from '@tma.js/sdk-react';
+import { useLaunchParams } from '@tma.js/sdk-react';
 
 import { Page } from '@/components/Page.tsx';
 
 export const HomePage: FC = () => {
   const navigate = useNavigate();
-  const rawInitData = useRawInitData();
-  const userId = (() => {
-    if (!rawInitData) return undefined;
-    try {
-      return JSON.parse(new URLSearchParams(rawInitData).get('user') ?? '')?.id;
-    } catch {
-      return undefined;
-    }
-  })();
+  const lp = useLaunchParams();
+  const userId =
+    lp?.tgWebAppData?.user?.id ||
+    lp?.initData?.user?.id ||
+    (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
+
+  console.log('userId:', userId);
 
   const handleAppleWatch = () => {
-    const link = `shortcuts://run-shortcut?name=СимптоМед Пульс&input=${userId}`;
+    const link = `shortcuts://run-shortcut?name=СимптоМед%20Пульс&input=${userId}`;
     window.open(link);
   };
 
