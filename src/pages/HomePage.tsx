@@ -8,7 +8,7 @@ export const HomePage: FC = () => {
   const navigate = useNavigate();
 
   const handleAppleWatch = () => {
-    const shortcutUrl = `https://www.icloud.com/shortcuts/bd9546f856ad49a5950233c6fcab6a2d`;
+    const shortcutUrl = 'https://www.icloud.com/shortcuts/33e4af7a107746b885145d00a6f5b58d';
     window.open(shortcutUrl);
   };
 
