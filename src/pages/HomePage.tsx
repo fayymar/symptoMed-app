@@ -19,6 +19,17 @@ export const HomePage: FC = () => {
     window.open(link);
   };
 
+  const showDebugInfo = () => {
+    const tg = (window as any).Telegram?.WebApp;
+    const info = {
+      'window.Telegram exists': !!tg,
+      'initDataUnsafe.user.id': tg?.initDataUnsafe?.user?.id,
+      'initData': tg?.initData?.substring(0, 100),
+      'rawInitData': rawInitData?.substring(0, 100),
+    };
+    alert(JSON.stringify(info, null, 2));
+  };
+
   return (
     <Page back={false}>
       <div style={{
@@ -86,6 +97,14 @@ export const HomePage: FC = () => {
             onClick={handleAppleWatch}
           >
             ⌚ Подключить Apple Watch
+          </Button>
+          <Button
+            size="l"
+            stretched
+            mode="outline"
+            onClick={showDebugInfo}
+          >
+            🔍 Показать мой ID
           </Button>
           <div style={{
             fontSize: 13,
