@@ -1,14 +1,18 @@
 import type { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@telegram-apps/telegram-ui';
-import { useInitData } from '@tma.js/sdk-react';
+import { useRawInitData } from '@tma.js/sdk-react';
 
 import { Page } from '@/components/Page.tsx';
 
 export const HomePage: FC = () => {
   const navigate = useNavigate();
-  const initData = useInitData(true);
-  const userId = initData?.user?.id;
+  const rawInitData = useRawInitData();
+  const userId = rawInitData
+    ? new URLSearchParams(rawInitData).get('user')
+      ? JSON.parse(new URLSearchParams(rawInitData).get('user') || '{}').id
+      : undefined
+    : undefined;
 
   const handleAppleWatch = () => {
     const link = `shortcuts://run-shortcut?name=СимптоМед%20Пульс&input=${userId}`;
