@@ -1,17 +1,12 @@
 import type { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@telegram-apps/telegram-ui';
-import { useLaunchParams } from '@tma.js/sdk-react';
 
 import { Page } from '@/components/Page.tsx';
 
 export const HomePage: FC = () => {
   const navigate = useNavigate();
-  const lp = useLaunchParams();
-  const userId =
-    lp?.tgWebAppData?.user?.id ||
-    lp?.initData?.user?.id ||
-    (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
+  const userId = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
 
   console.log('userId:', userId);
 
