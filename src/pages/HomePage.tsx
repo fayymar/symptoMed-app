@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@telegram-apps/telegram-ui';
 
@@ -7,29 +6,10 @@ import { Page } from '@/components/Page.tsx';
 
 export const HomePage: FC = () => {
   const navigate = useNavigate();
-  const [userId, setUserId] = useState<number | undefined>(undefined);
-
-  useEffect(() => {
-    const tg = (window as any).Telegram?.WebApp;
-    if (tg) {
-      tg.ready();
-      setUserId(tg.initDataUnsafe?.user?.id);
-    }
-  }, []);
 
   const handleAppleWatch = () => {
-    const link = `shortcuts://run-shortcut?name=СимптоМед%20Пульс&input=${userId}`;
-    window.open(link);
-  };
-
-  const showDebugInfo = () => {
-    const tg = (window as any).Telegram?.WebApp;
-    const info = {
-      'window.Telegram exists': !!tg,
-      'initDataUnsafe.user.id': tg?.initDataUnsafe?.user?.id,
-      'initData': tg?.initData?.substring(0, 100),
-    };
-    alert(JSON.stringify(info, null, 2));
+    const shortcutUrl = `https://www.icloud.com/shortcuts/bd9546f856ad49a5950233c6fcab6a2d`;
+    window.open(shortcutUrl);
   };
 
   return (
@@ -99,14 +79,6 @@ export const HomePage: FC = () => {
             onClick={handleAppleWatch}
           >
             ⌚ Подключить Apple Watch
-          </Button>
-          <Button
-            size="l"
-            stretched
-            mode="outline"
-            onClick={showDebugInfo}
-          >
-            🔍 Показать мой ID
           </Button>
           <div style={{
             fontSize: 13,
