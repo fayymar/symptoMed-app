@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@telegram-apps/telegram-ui';
 
@@ -6,9 +7,17 @@ import { Page } from '@/components/Page.tsx';
 
 export const HomePage: FC = () => {
   const navigate = useNavigate();
-  const userId = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
+  const [userId, setUserId] = useState<number | undefined>(undefined);
 
-  console.log('userId:', userId);
+  useEffect(() => {
+    const tg = (window as any).Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      const id = tg.initDataUnsafe?.user?.id;
+      setUserId(id);
+      console.log('Telegram userId:', id);
+    }
+  }, []);
 
   const handleAppleWatch = () => {
     const link = `shortcuts://run-shortcut?name=СимптоМед%20Пульс&input=${userId}`;
