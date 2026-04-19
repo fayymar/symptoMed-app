@@ -1,12 +1,17 @@
 import { useState, useEffect, type FC } from 'react';
 import { Section, Cell, List } from '@telegram-apps/telegram-ui';
-import { useRawInitData } from '@tma.js/sdk-react';
 
 import { Page } from '@/components/Page.tsx';
 
-interface HeartrateEntry {
-  date: string;
+interface HeartrateRecord {
   value: number;
+  recorded_at: string;
+  source: string;
+}
+
+interface HeartrateResponse {
+  records: HeartrateRecord[];
+  has_data: boolean;
 }
 
 function getColor(value: number): string {
@@ -22,18 +27,25 @@ function getLabel(value: number): string {
   return 'Норма';
 }
 
-export const HeartratePage: FC = () => {
-  const rawInitData = useRawInitData();
-  const userId = (() => {
-    if (!rawInitData) return undefined;
-    try {
-      return JSON.parse(new URLSearchParams(rawInitData).get('user') ?? '')?.id;
-    } catch {
-      return undefined;
-    }
-  })();
+function formatDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const isToday =
+    date.getDate() === now.getDate() &&
+    date.getMonth() === now.getMonth() &&
+    date.getFullYear() === now.getFullYear();
 
-  const [entries, setEntries] = useState<HeartrateEntry[]>([]);
+  const time = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+
+  if (isToday) return `Сегодня ${time}`;
+
+  return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) + ' ' + time;
+}
+
+export const HeartratePage: FC = () => {
+  const userId = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
+
+  const [records, setRecords] = useState<HeartrateRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -48,7 +60,10 @@ export const HeartratePage: FC = () => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       })
-      .then((data: HeartrateEntry[]) => setEntries(data))
+      .then((data: HeartrateResponse) => {
+        console.log(data);
+        setRecords(data.records ?? []);
+      })
       .catch(() => setError('Не удалось загрузить историю пульса'))
       .finally(() => setLoading(false));
   }, [userId]);
@@ -108,7 +123,7 @@ export const HeartratePage: FC = () => {
           </div>
         )}
 
-        {!loading && !error && entries.length === 0 && (
+        {!loading && !error && records.length === 0 && (
           <div style={{
             flex: 1,
             display: 'flex',
@@ -119,38 +134,41 @@ export const HeartratePage: FC = () => {
             textAlign: 'center',
             padding: '0 32px',
           }}>
-            Нет данных. Подключите Apple Watch и запустите Shortcut.
+            Пока нет записей. Отправьте первый пульс!
           </div>
         )}
 
-        {!loading && !error && entries.length > 0 && (
+        {!loading && !error && records.length > 0 && (
           <List>
             <Section>
-              {entries.map((entry, i) => (
+              {records.map((record, i) => (
                 <Cell
                   key={i}
-                  subtitle={new Date(entry.date).toLocaleString('ru-RU', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                  subtitle={formatDate(record.recorded_at)}
+                  before={
+                    <div style={{
+                      width: 12,
+                      height: 12,
+                      borderRadius: 6,
+                      background: getColor(record.value),
+                      flexShrink: 0,
+                    }} />
+                  }
                   after={
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <span style={{
                         fontSize: 13,
-                        color: getColor(entry.value),
+                        color: getColor(record.value),
                         fontWeight: 500,
                       }}>
-                        {getLabel(entry.value)}
+                        {getLabel(record.value)}
                       </span>
                       <span style={{
                         fontSize: 20,
                         fontWeight: 700,
-                        color: getColor(entry.value),
+                        color: getColor(record.value),
                       }}>
-                        {entry.value}
+                        {record.value}
                       </span>
                       <span style={{
                         fontSize: 13,
