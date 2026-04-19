@@ -7,9 +7,17 @@ import { Page } from '@/components/Page.tsx';
 export const HomePage: FC = () => {
   const navigate = useNavigate();
 
-  const handleAppleWatch = () => {
-    const shortcutUrl = 'https://www.icloud.com/shortcuts/33e4af7a107746b885145d00a6f5b58d';
-    window.open(shortcutUrl);
+  const handleSendPulse = () => {
+    const userId = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
+    if (!userId) {
+      alert('Откройте приложение через бота');
+      return;
+    }
+    window.open(`shortcuts://run-shortcut?name=СимптоМед%20-%20Пульс&input=${userId}`);
+  };
+
+  const handleInstallShortcut = () => {
+    window.open('https://www.icloud.com/shortcuts/33e4af7a107746b885145d00a6f5b58d');
   };
 
   return (
@@ -75,10 +83,17 @@ export const HomePage: FC = () => {
           <Button
             size="l"
             stretched
-            mode="outline"
-            onClick={handleAppleWatch}
+            onClick={handleSendPulse}
           >
-            ⌚ Подключить Apple Watch
+            ❤️ Отправить пульс
+          </Button>
+          <Button
+            size="l"
+            stretched
+            mode="outline"
+            onClick={handleInstallShortcut}
+          >
+            ⌚ Установить Shortcut
           </Button>
           <div style={{
             fontSize: 13,
@@ -86,8 +101,16 @@ export const HomePage: FC = () => {
             textAlign: 'center',
             lineHeight: 1.5,
           }}>
-            Нажмите чтобы установить Shortcut для Apple Watch. После установки запускайте его для отправки пульса.
+            Если ещё не установлен на этом устройстве
           </div>
+          <Button
+            size="l"
+            stretched
+            mode="outline"
+            onClick={() => navigate('/automation')}
+          >
+            ⚙️ Настроить автоматическую отправку
+          </Button>
         </div>
       </div>
     </Page>
