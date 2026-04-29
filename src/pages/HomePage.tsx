@@ -7,19 +7,6 @@ import { Page } from '@/components/Page.tsx';
 export const HomePage: FC = () => {
   const navigate = useNavigate();
 
-  const handleSendPulse = () => {
-    const userId = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
-    if (!userId) {
-      alert('Откройте приложение через бота');
-      return;
-    }
-    window.open(`shortcuts://run-shortcut?name=СимптоМед%20-%20Пульс&input=${userId}`);
-  };
-
-  const handleInstallShortcut = () => {
-    window.open('https://www.icloud.com/shortcuts/33e4af7a107746b885145d00a6f5b58d');
-  };
-
   return (
     <Page back={false}>
       <div style={{
@@ -76,48 +63,9 @@ export const HomePage: FC = () => {
             size="l"
             stretched
             mode="outline"
-            onClick={() => navigate('/heartrate')}
+            onClick={() => navigate('/pulse')}
           >
-            ❤️ История пульса
-          </Button>
-          <Button
-            size="l"
-            stretched
-            onClick={handleSendPulse}
-          >
-            ❤️ Отправить пульс
-          </Button>
-          <Button
-            size="l"
-            stretched
-            mode="outline"
-            onClick={handleInstallShortcut}
-          >
-            ⌚ Установить Shortcut
-          </Button>
-          <div style={{
-            fontSize: 13,
-            color: 'var(--tg-theme-hint-color, #999)',
-            textAlign: 'center',
-            lineHeight: 1.5,
-          }}>
-            Если ещё не установлен на этом устройстве
-          </div>
-          <Button
-            size="l"
-            stretched
-            mode="outline"
-            onClick={() => navigate('/setup-shortcut')}
-          >
-            🔧 Настроить Shortcut
-          </Button>
-          <Button
-            size="l"
-            stretched
-            mode="outline"
-            onClick={() => navigate('/automation')}
-          >
-            ⚙️ Настроить автоматическую отправку
+            ❤️ Пульс с Apple Watch
           </Button>
         </div>
       </div>

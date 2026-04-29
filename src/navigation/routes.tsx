@@ -7,8 +7,8 @@ import { DurationPage } from '@/pages/DurationPage.tsx';
 import { ResultPage } from '@/pages/ResultPage.tsx';
 import { LoadingPage } from '@/pages/LoadingPage.tsx';
 import { HeartratePage } from '@/pages/HeartratePage.tsx';
-import { AutomationPage } from '@/pages/AutomationPage.tsx';
-import { SetupShortcutPage } from '@/pages/SetupShortcutPage.tsx';
+import { PulsePage } from '@/pages/PulsePage.tsx';
+import { PulseSetupPage } from '@/pages/PulseSetupPage.tsx';
 
 interface Route {
   path: string;
@@ -23,6 +23,6 @@ export const routes: Route[] = [
   { path: '/result', Component: ResultPage },
   { path: '/loading', Component: LoadingPage },
   { path: '/heartrate', Component: HeartratePage },
-  { path: '/automation', Component: AutomationPage },
-  { path: '/setup-shortcut', Component: SetupShortcutPage },
+  { path: '/pulse', Component: PulsePage },
+  { path: '/pulse-setup', Component: PulseSetupPage },
 ];
