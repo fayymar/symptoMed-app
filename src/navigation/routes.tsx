@@ -8,6 +8,7 @@ import { ResultPage } from '@/pages/ResultPage.tsx';
 import { LoadingPage } from '@/pages/LoadingPage.tsx';
 import { HeartratePage } from '@/pages/HeartratePage.tsx';
 import { AutomationPage } from '@/pages/AutomationPage.tsx';
+import { SetupShortcutPage } from '@/pages/SetupShortcutPage.tsx';
 
 interface Route {
   path: string;
@@ -23,4 +24,5 @@ export const routes: Route[] = [
   { path: '/loading', Component: LoadingPage },
   { path: '/heartrate', Component: HeartratePage },
   { path: '/automation', Component: AutomationPage },
+  { path: '/setup-shortcut', Component: SetupShortcutPage },
 ];

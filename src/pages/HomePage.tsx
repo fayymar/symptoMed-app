@@ -107,6 +107,14 @@ export const HomePage: FC = () => {
             size="l"
             stretched
             mode="outline"
+            onClick={() => navigate('/setup-shortcut')}
+          >
+            🔧 Настроить Shortcut
+          </Button>
+          <Button
+            size="l"
+            stretched
+            mode="outline"
             onClick={() => navigate('/automation')}
           >
             ⚙️ Настроить автоматическую отправку
