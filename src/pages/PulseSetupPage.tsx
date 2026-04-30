@@ -8,7 +8,7 @@ import { Page } from '@/components/Page.tsx';
 const SETUP_STEPS = [
   'Скопируйте ID кнопкой выше',
   'Откройте приложение Быстрые команды',
-  'Найдите "СимптоМед — Пульс" и откройте на редактирование',
+  'Найдите "СимптоМед — Здоровье" и откройте на редактирование',
   'Нажмите на первое действие "Получить входные данные команды"',
   'В поле "Если нет входных данных" нажмите на текущее значение',
   'Удалите старое значение и вставьте свой ID',
@@ -25,7 +25,7 @@ const AUTOMATION_STEPS = [
   'Нажмите "Далее"',
   'Нажмите "Добавить действие"',
   'В поиске введите "Запустить быструю команду"',
-  'Выберите "СимптоМед — Пульс"',
+  'Выберите "СимптоМед — Здоровье"',
   'Выключите "Спрашивать перед запуском"',
   'Нажмите "Готово"',
 ];
@@ -127,7 +127,7 @@ export const PulseSetupPage: FC = () => {
               </div>
             </div>
           </div>
-          <Button size="l" stretched mode="outline" onClick={() => navigate('/pulse')}>
+          <Button size="l" stretched mode="outline" onClick={() => navigate('/health')}>
             Назад
           </Button>
         </div>
@@ -159,7 +159,7 @@ export const PulseSetupPage: FC = () => {
             marginBottom: 28,
             lineHeight: 1.5,
           }}>
-            Настройте один раз — пульс будет отправляться автоматически каждый день
+            Настройте один раз — показатели будут отправляться автоматически каждый день
           </div>
 
           {/* Шаг 1 */}
@@ -170,12 +170,12 @@ export const PulseSetupPage: FC = () => {
             marginBottom: 12,
             lineHeight: 1.5,
           }}>
-            Скачайте быструю команду которая будет читать пульс из приложения Здоровье и отправлять его в бот.
+            Скачайте быструю команду которая будет читать пульс, давление, SpO2 и шаги из приложения Здоровье и отправлять их в бот.
           </div>
           <Button
             size="m"
             stretched
-            onClick={() => window.open('https://www.icloud.com/shortcuts/33e4af7a107746b885145d00a6f5b58d')}
+            onClick={() => window.open('https://www.icloud.com/shortcuts/d3f37fa9392d4465a20b454582c1f0a1')}
           >
             📥 Установить Shortcut
           </Button>
@@ -197,7 +197,7 @@ export const PulseSetupPage: FC = () => {
             marginBottom: 16,
             lineHeight: 1.5,
           }}>
-            Чтобы пульс отправлялся именно вам, нужно один раз указать ваш Telegram ID в Shortcut.
+            Чтобы показатели отправлялись именно вам, нужно один раз указать ваш Telegram ID в Shortcut.
           </div>
 
           <div style={{
@@ -262,7 +262,7 @@ export const PulseSetupPage: FC = () => {
             marginBottom: 16,
             lineHeight: 1.5,
           }}>
-            Хотите чтобы пульс отправлялся автоматически каждый день в одно и то же время? Настройте автоматизацию.
+            Хотите чтобы показатели отправлялись автоматически каждый день в одно и то же время? Настройте автоматизацию.
           </div>
           <StepList steps={AUTOMATION_STEPS} />
 
@@ -274,12 +274,12 @@ export const PulseSetupPage: FC = () => {
             lineHeight: 1.5,
             textAlign: 'center',
           }}>
-            ✅ Готово! Теперь каждый день в установленное время ваш пульс будет автоматически отправляться в бот.
+            ✅ Готово! Теперь каждый день в установленное время ваши показатели здоровья будут автоматически отправляться в бот.
           </div>
         </div>
 
         <div style={{ paddingTop: 24 }}>
-          <Button size="l" stretched mode="outline" onClick={() => navigate('/pulse')}>
+          <Button size="l" stretched mode="outline" onClick={() => navigate('/health')}>
             Назад
           </Button>
         </div>

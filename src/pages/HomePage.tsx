@@ -63,9 +63,9 @@ export const HomePage: FC = () => {
             size="l"
             stretched
             mode="outline"
-            onClick={() => navigate('/pulse')}
+            onClick={() => navigate('/health')}
           >
-            ❤️ Пульс с Apple Watch
+            🩺 Здоровье с Apple Watch
           </Button>
         </div>
       </div>
