@@ -5,16 +5,6 @@ import { Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
 
-const SETUP_STEPS = [
-  'Скопируйте ID кнопкой выше',
-  'Откройте приложение Быстрые команды',
-  'Найдите "СимптоМед — Здоровье" и откройте на редактирование',
-  'Нажмите на первое действие "Получить входные данные команды"',
-  'В поле "Если нет входных данных" нажмите на текущее значение',
-  'Удалите старое значение и вставьте свой ID',
-  'Нажмите "Готово" вверху',
-];
-
 const AUTOMATION_STEPS = [
   'Откройте Быстрые команды',
   'Перейдите на вкладку "Автоматизация" внизу',
@@ -30,110 +20,34 @@ const AUTOMATION_STEPS = [
   'Нажмите "Готово"',
 ];
 
-function StepList({ steps }: { steps: string[] }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      {steps.map((step, i) => (
-        <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-          <div style={{
-            minWidth: 26,
-            height: 26,
-            borderRadius: 13,
-            background: 'var(--tg-theme-button-color, #2481cc)',
-            color: 'var(--tg-theme-button-text-color, #fff)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 12,
-            fontWeight: 700,
-            flexShrink: 0,
-          }}>
-            {i + 1}
-          </div>
-          <div style={{
-            fontSize: 14,
-            color: 'var(--tg-theme-text-color, #000)',
-            lineHeight: 1.5,
-            paddingTop: 3,
-          }}>
-            {step}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function SectionTitle({ children }: { children: string }) {
-  return (
-    <div style={{
-      fontSize: 17,
-      fontWeight: 700,
-      color: 'var(--tg-theme-text-color, #000)',
-      marginBottom: 8,
-    }}>
-      {children}
-    </div>
-  );
-}
-
 export const PulseSetupPage: FC = () => {
   const navigate = useNavigate();
-  const platform = (window as any).Telegram?.WebApp?.platform;
-  const isIOS = platform === 'ios';
   const userId = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
   const [copied, setCopied] = useState(false);
+  const [automationOpen, setAutomationOpen] = useState(false);
 
   const handleCopy = () => {
     if (!userId) return;
     navigator.clipboard.writeText(String(userId)).then(() => {
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), 3000);
     });
   };
 
-  if (!isIOS) {
-    return (
-      <Page back={false}>
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: '100vh',
-          padding: '24px 16px 32px',
-          boxSizing: 'border-box',
-        }}>
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{
-              background: 'var(--tg-theme-secondary-bg-color, #f4f4f5)',
-              borderRadius: 12,
-              padding: '20px 16px',
-              textAlign: 'center',
-            }}>
-              <div style={{ fontSize: 32, marginBottom: 12 }}>⚠️</div>
-              <div style={{
-                fontSize: 16,
-                fontWeight: 600,
-                color: 'var(--tg-theme-text-color, #000)',
-                marginBottom: 8,
-              }}>
-                Эта функция доступна только на iPhone
-              </div>
-              <div style={{
-                fontSize: 14,
-                color: 'var(--tg-theme-hint-color, #999)',
-                lineHeight: 1.5,
-              }}>
-                Для работы с Apple Watch и автоматической отправки пульса нужен iPhone с приложением Здоровье.
-              </div>
-            </div>
-          </div>
-          <Button size="l" stretched mode="outline" onClick={() => navigate('/health')}>
-            Назад
-          </Button>
-        </div>
-      </Page>
-    );
-  }
+  const blockStyle: React.CSSProperties = {
+    background: 'var(--tg-theme-secondary-bg-color, #f4f4f5)',
+    borderRadius: 16,
+    padding: '20px 16px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 12,
+  };
+
+  const stepTitleStyle: React.CSSProperties = {
+    fontSize: 17,
+    fontWeight: 700,
+    color: 'var(--tg-theme-text-color, #000)',
+  };
 
   return (
     <Page back={false}>
@@ -143,146 +57,150 @@ export const PulseSetupPage: FC = () => {
         minHeight: '100vh',
         padding: '24px 16px 32px',
         boxSizing: 'border-box',
+        gap: 16,
       }}>
-        <div style={{ flex: 1 }}>
-          <div style={{
-            fontSize: 24,
-            fontWeight: 700,
-            color: 'var(--tg-theme-text-color, #000)',
-            marginBottom: 8,
-          }}>
-            ⚙️ Настройка Apple Watch
-          </div>
-          <div style={{
-            fontSize: 15,
-            color: 'var(--tg-theme-hint-color, #999)',
-            marginBottom: 28,
-            lineHeight: 1.5,
-          }}>
-            Настройте один раз — показатели будут отправляться автоматически каждый день
-          </div>
 
-          {/* Шаг 1 */}
-          <SectionTitle>Шаг 1 — Установить Shortcut</SectionTitle>
-          <div style={{
-            fontSize: 14,
-            color: 'var(--tg-theme-hint-color, #999)',
-            marginBottom: 12,
-            lineHeight: 1.5,
-          }}>
-            Скачайте быструю команду которая будет читать пульс, давление, SpO2 и шаги из приложения Здоровье и отправлять их в бот.
+        {/* Header */}
+        <div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--tg-theme-text-color, #000)', marginBottom: 6 }}>
+            ⚙️ Настройка за 3 шага
           </div>
+          <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)', lineHeight: 1.5 }}>
+            После настройки пульс, давление, SpO2 и шаги будут отправляться автоматически
+          </div>
+        </div>
+
+        {/* Step 1 */}
+        <div style={blockStyle}>
+          <div style={stepTitleStyle}>📋 Шаг 1: Скопируйте ваш ID</div>
+          {userId ? (
+            <>
+              <div style={{
+                background: 'var(--tg-theme-bg-color, #fff)',
+                border: '2px solid var(--tg-theme-button-color, #2481cc)',
+                borderRadius: 12,
+                padding: '14px 16px',
+                textAlign: 'center',
+                fontFamily: 'monospace',
+                fontSize: 28,
+                fontWeight: 700,
+                color: 'var(--tg-theme-text-color, #000)',
+                letterSpacing: 2,
+              }}>
+                {userId}
+              </div>
+              <Button size="l" stretched onClick={handleCopy}>
+                {copied ? '✅ Скопировано! Откройте Shortcuts' : 'Скопировать ID'}
+              </Button>
+            </>
+          ) : (
+            <div style={{ fontSize: 14, color: '#ec3942', textAlign: 'center' }}>
+              Откройте через бота
+            </div>
+          )}
+        </div>
+
+        {/* Step 2 */}
+        <div style={blockStyle}>
+          <div style={stepTitleStyle}>📥 Шаг 2: Установите Shortcut</div>
           <Button
-            size="m"
+            size="l"
             stretched
             onClick={() => window.open('https://www.icloud.com/shortcuts/d3f37fa9392d4465a20b454582c1f0a1')}
           >
-            📥 Установить Shortcut
+            Установить Shortcut
           </Button>
-          <div style={{
-            fontSize: 13,
-            color: 'var(--tg-theme-hint-color, #999)',
-            textAlign: 'center',
-            marginTop: 6,
-            marginBottom: 28,
-          }}>
-            Нажмите "Добавить команду" в открывшемся окне
+          <div style={{ fontSize: 13, color: 'var(--tg-theme-hint-color, #999)', textAlign: 'center' }}>
+            В открывшемся окне нажмите "Добавить команду"
           </div>
+        </div>
 
-          {/* Шаг 2 */}
-          <SectionTitle>Шаг 2 — Привязать ваш Telegram</SectionTitle>
-          <div style={{
-            fontSize: 14,
-            color: 'var(--tg-theme-hint-color, #999)',
-            marginBottom: 16,
-            lineHeight: 1.5,
-          }}>
-            Чтобы показатели отправлялись именно вам, нужно один раз указать ваш Telegram ID в Shortcut.
+        {/* Step 3 */}
+        <div style={blockStyle}>
+          <div style={stepTitleStyle}>🔧 Шаг 3: Вставьте свой ID в Shortcut</div>
+          <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)', lineHeight: 1.5 }}>
+            После установки Shortcut откроется автоматически. Найдите первое действие "Получить входные данные команды" и:
           </div>
-
-          <div style={{
-            background: 'var(--tg-theme-secondary-bg-color, #f4f4f5)',
-            borderRadius: 12,
-            padding: '16px',
-            marginBottom: 16,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 10,
-          }}>
-            <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)' }}>
-              Ваш Telegram ID:
-            </div>
-            {userId ? (
-              <>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {[
+              'Нажмите на поле "Если нет входных данных"',
+              'Выберите "Использовать"',
+              'Долгое нажатие на текстовое поле → "Вставить"',
+              'Нажмите "Готово" вверху',
+            ].map((step, i) => (
+              <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                 <div style={{
-                  fontSize: 30,
-                  fontWeight: 700,
-                  color: 'var(--tg-theme-text-color, #000)',
-                  letterSpacing: 1,
+                  minWidth: 24, height: 24, borderRadius: 12,
+                  background: 'var(--tg-theme-button-color, #2481cc)',
+                  color: 'var(--tg-theme-button-text-color, #fff)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 12, fontWeight: 700, flexShrink: 0,
                 }}>
-                  {userId}
+                  {i + 1}
                 </div>
-                <Button size="m" mode={copied ? 'filled' : 'outline'} onClick={handleCopy}>
-                  {copied ? '✅ Скопировано!' : '📋 Скопировать ID'}
-                </Button>
-              </>
-            ) : (
-              <div style={{ fontSize: 14, color: '#ec3942', textAlign: 'center' }}>
-                Откройте приложение через бота
+                <div style={{ fontSize: 14, color: 'var(--tg-theme-text-color, #000)', lineHeight: 1.5, paddingTop: 3 }}>
+                  {step}
+                </div>
               </div>
-            )}
+            ))}
           </div>
+          <Button size="m" stretched mode="outline" onClick={() => window.open('shortcuts://')}>
+            Открыть приложение Shortcuts
+          </Button>
+        </div>
 
-          <div style={{
-            fontSize: 14,
-            fontWeight: 600,
-            color: 'var(--tg-theme-text-color, #000)',
-            marginBottom: 12,
-          }}>
-            Как вставить ID в Shortcut:
+        {/* Divider */}
+        <div style={{ height: 1, background: 'var(--tg-theme-secondary-bg-color, #f0f0f0)' }} />
+
+        {/* Optional: Automation */}
+        <div style={blockStyle}>
+          <div style={stepTitleStyle}>🔄 Опционально: Автоматическая отправка</div>
+          <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)', lineHeight: 1.5 }}>
+            Хотите чтобы данные отправлялись сами каждый день?
           </div>
-          <StepList steps={SETUP_STEPS} />
-
           <Button
             size="m"
             stretched
             mode="outline"
-            onClick={() => window.open('shortcuts://')}
-            style={{ marginTop: 16, marginBottom: 28 }}
+            onClick={() => setAutomationOpen((v) => !v)}
           >
-            🔗 Открыть приложение Shortcuts
+            {automationOpen ? 'Скрыть инструкцию' : 'Показать инструкцию'}
           </Button>
 
-          {/* Шаг 3 */}
-          <SectionTitle>Шаг 3 — Настроить автоматизацию (необязательно)</SectionTitle>
-          <div style={{
-            fontSize: 14,
-            color: 'var(--tg-theme-hint-color, #999)',
-            marginBottom: 16,
-            lineHeight: 1.5,
-          }}>
-            Хотите чтобы показатели отправлялись автоматически каждый день в одно и то же время? Настройте автоматизацию.
-          </div>
-          <StepList steps={AUTOMATION_STEPS} />
-
-          <div style={{
-            marginTop: 20,
-            marginBottom: 8,
-            fontSize: 15,
-            color: 'var(--tg-theme-hint-color, #999)',
-            lineHeight: 1.5,
-            textAlign: 'center',
-          }}>
-            ✅ Готово! Теперь каждый день в установленное время ваши показатели здоровья будут автоматически отправляться в бот.
-          </div>
+          {automationOpen && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
+              {AUTOMATION_STEPS.map((step, i) => (
+                <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                  <div style={{
+                    minWidth: 24, height: 24, borderRadius: 12,
+                    background: 'var(--tg-theme-button-color, #2481cc)',
+                    color: 'var(--tg-theme-button-text-color, #fff)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 12, fontWeight: 700, flexShrink: 0,
+                  }}>
+                    {i + 1}
+                  </div>
+                  <div style={{ fontSize: 14, color: 'var(--tg-theme-text-color, #000)', lineHeight: 1.5, paddingTop: 3 }}>
+                    {step}
+                  </div>
+                </div>
+              ))}
+              <div style={{
+                marginTop: 8,
+                fontSize: 14,
+                color: 'var(--tg-theme-hint-color, #999)',
+                lineHeight: 1.5,
+                textAlign: 'center',
+              }}>
+                ✅ Готово! Теперь все ваши показатели здоровья отправляются автоматически.
+              </div>
+            </div>
+          )}
         </div>
 
-        <div style={{ paddingTop: 24 }}>
-          <Button size="l" stretched mode="outline" onClick={() => navigate('/health')}>
-            Назад
-          </Button>
-        </div>
+        <Button size="l" stretched mode="outline" onClick={() => navigate('/health')}>
+          Назад
+        </Button>
       </div>
     </Page>
   );

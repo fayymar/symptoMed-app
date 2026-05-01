@@ -18,7 +18,7 @@ type Step = 'duration' | 'anamnesis';
 
 export const DurationPage: FC = () => {
   const navigate = useNavigate();
-  const { sessionId, setDuration, setAnamnesisData, setAnamnesisAnswer, anamnesisAnswers } = useConsultation();
+  const { sessionId, setDuration, setAnamnesisData, setAnamnesisAnswer } = useConsultation();
   const [step, setStep] = useState<Step>('duration');
   const [anamnesisQuestions, setLocalAnamnesisQuestions] = useState<{ text: string; options: string[] }[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
