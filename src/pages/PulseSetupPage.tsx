@@ -106,7 +106,7 @@ export const PulseSetupPage: FC = () => {
           <Button
             size="l"
             stretched
-            onClick={() => window.open('https://www.icloud.com/shortcuts/533b3e9e9ec4437e9a7d22cda2e59e93')}
+            onClick={() => window.open('https://www.icloud.com/shortcuts/2b68bf4a2f8746e4b8821444fffe766a')}
           >
             Установить Shortcut
           </Button>
