@@ -4,26 +4,62 @@ import { Button, Textarea } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
 import { startConsultation } from '@/api/consultation.ts';
+import { useConsultation } from '@/contexts/ConsultationContext.tsx';
 
 export const SymptomsPage: FC = () => {
   const navigate = useNavigate();
+  const { setSessionData, setSymptoms: saveSymptoms } = useConsultation();
   const [symptoms, setSymptoms] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [needsMetrics, setNeedsMetrics] = useState<string[]>([]);
+  const [pendingNavigate, setPendingNavigate] = useState(false);
+
+  const userId: number | undefined = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
+
+  const proceed = () => {
+    setNeedsMetrics([]);
+    setPendingNavigate(false);
+    navigate('/questions');
+  };
 
   const handleNext = async () => {
+    if (!userId) {
+      setError('Откройте приложение через бота');
+      return;
+    }
     setLoading(true);
     setError('');
     try {
-      const data = await startConsultation(1, symptoms);
-      localStorage.setItem('symptoMed_sessionId', data.sessionId);
-      localStorage.setItem('symptoMed_questions', JSON.stringify(data.questions));
-      navigate('/questions');
+      const data = await startConsultation(userId, symptoms);
+      saveSymptoms(symptoms);
+      setSessionData(
+        data.session_id,
+        data.questions ?? [],
+        data.red_flag ?? null,
+        data.needs_fresh_metrics ?? [],
+      );
+
+      if (data.red_flag?.text) {
+        alert(`🚨 Срочно обратитесь к врачу\n\n${data.red_flag.text}`);
+      }
+
+      if (data.needs_fresh_metrics && data.needs_fresh_metrics.length > 0) {
+        setNeedsMetrics(data.needs_fresh_metrics);
+        setPendingNavigate(true);
+      } else {
+        navigate('/questions');
+      }
     } catch {
-      setError('Ошибка соединения. Попробуйте снова.');
+      setError('Ошибка соединения. Попробуйте ещё раз.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleMeasure = () => {
+    if (!userId) return;
+    window.open(`shortcuts://run-shortcut?name=СимптоМед%20-%20Здоровье&input=${userId}`);
   };
 
   return (
@@ -59,26 +95,48 @@ export const SymptomsPage: FC = () => {
         />
 
         {error && (
-          <div style={{
-            marginTop: 12,
-            fontSize: 14,
-            color: '#ec3942',
-            textAlign: 'center',
-          }}>
+          <div style={{ marginTop: 12, fontSize: 14, color: '#ec3942', textAlign: 'center' }}>
             {error}
           </div>
         )}
 
-        <div style={{ paddingTop: 24, paddingBottom: 32 }}>
-          <Button
-            size="l"
-            stretched
-            disabled={symptoms.trim().length === 0 || loading}
-            onClick={handleNext}
-          >
-            {loading ? 'Загрузка...' : 'Далее'}
-          </Button>
-        </div>
+        {pendingNavigate && needsMetrics.length > 0 && (
+          <div style={{
+            marginTop: 16,
+            padding: 16,
+            background: 'var(--tg-theme-secondary-bg-color, #f4f4f5)',
+            borderRadius: 12,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 12,
+          }}>
+            <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--tg-theme-text-color, #000)' }}>
+              💡 Для точного анализа измерьте:
+            </div>
+            <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)' }}>
+              {needsMetrics.join(', ')}
+            </div>
+            <Button size="m" stretched onClick={handleMeasure}>
+              Измерить сейчас
+            </Button>
+            <Button size="m" stretched mode="outline" onClick={proceed}>
+              Продолжить без измерений
+            </Button>
+          </div>
+        )}
+
+        {!pendingNavigate && (
+          <div style={{ paddingTop: 24, paddingBottom: 32 }}>
+            <Button
+              size="l"
+              stretched
+              disabled={symptoms.trim().length === 0 || loading}
+              onClick={handleNext}
+            >
+              {loading ? 'Загрузка...' : 'Далее'}
+            </Button>
+          </div>
+        )}
       </div>
     </Page>
   );

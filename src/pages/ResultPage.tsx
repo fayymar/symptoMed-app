@@ -1,9 +1,9 @@
-import { useState, useEffect, type FC } from 'react';
+import { type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Section, Cell, List } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
-import { getResult, type Specialist } from '@/api/consultation.ts';
+import { useConsultation } from '@/contexts/ConsultationContext.tsx';
 
 const SPECIALIST_EMOJI: Record<string, string> = {
   'Терапевт': '👨‍⚕️',
@@ -24,23 +24,43 @@ function getEmoji(name: string): string {
 
 export const ResultPage: FC = () => {
   const navigate = useNavigate();
-  const [specialists, setSpecialists] = useState<Specialist[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { result, reset } = useConsultation();
 
-  useEffect(() => {
-    const sessionId = localStorage.getItem('symptoMed_sessionId') ?? '';
-    getResult(sessionId)
-      .then((data) => setSpecialists(data.specialists))
-      .catch(() => setError('Не удалось загрузить результаты'))
-      .finally(() => setLoading(false));
-  }, []);
+  const userId: number | undefined = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
 
   const handleNewConsultation = () => {
-    localStorage.removeItem('symptoMed_sessionId');
-    localStorage.removeItem('symptoMed_questions');
+    reset();
     navigate('/');
   };
+
+  const handleMeasure = () => {
+    if (!userId) return;
+    window.open(`shortcuts://run-shortcut?name=СимптоМед%20-%20Здоровье&input=${userId}`);
+  };
+
+  if (!result) {
+    return (
+      <Page back={false}>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '100vh',
+          padding: '24px 16px',
+        }}>
+          <div style={{ fontSize: 15, color: '#ec3942', textAlign: 'center', marginBottom: 24 }}>
+            Не удалось загрузить результаты
+          </div>
+          <Button size="l" stretched mode="outline" onClick={handleNewConsultation}>
+            Новая консультация
+          </Button>
+        </div>
+      </Page>
+    );
+  }
+
+  const isEmergency = result.urgency === 'emergency';
 
   return (
     <Page back={false}>
@@ -51,112 +71,117 @@ export const ResultPage: FC = () => {
         padding: '24px 0 0',
         boxSizing: 'border-box',
       }}>
-        <div style={{
-          fontSize: 24,
-          fontWeight: 700,
-          color: 'var(--tg-theme-text-color, #000)',
-          padding: '0 16px',
-          marginBottom: 4,
-        }}>
-          Рекомендуемые специалисты
-        </div>
-        <div style={{
-          fontSize: 14,
-          color: 'var(--tg-theme-hint-color, #999)',
-          padding: '0 16px',
-          marginBottom: 20,
-        }}>
-          На основе ваших симптомов
-        </div>
 
-        {loading && (
+        {/* Emergency block */}
+        {isEmergency && (
           <div style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 15,
-            color: 'var(--tg-theme-hint-color, #999)',
+            margin: '0 16px 20px',
+            padding: 16,
+            background: '#ffebec',
+            borderRadius: 12,
+            border: '1px solid #ec3942',
           }}>
-            Анализирую результаты...
+            <div style={{ fontSize: 18, fontWeight: 700, color: '#ec3942', marginBottom: 6 }}>
+              🚨 Срочно вызовите скорую
+            </div>
+            <div style={{ fontSize: 14, color: '#ec3942', lineHeight: 1.5 }}>
+              Ваши симптомы требуют немедленной медицинской помощи. Позвоните 103.
+            </div>
           </div>
         )}
 
-        {error && (
-          <div style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 15,
-            color: '#ec3942',
-            padding: '0 16px',
-            textAlign: 'center',
-          }}>
-            {error}
+        {/* Recommendation */}
+        {result.recommendation && (
+          <div style={{ padding: '0 16px', marginBottom: 20 }}>
+            <div style={{
+              fontSize: 15,
+              color: 'var(--tg-theme-text-color, #000)',
+              lineHeight: 1.6,
+              background: 'var(--tg-theme-secondary-bg-color, #f4f4f5)',
+              borderRadius: 12,
+              padding: 16,
+            }}>
+              {result.recommendation}
+            </div>
           </div>
         )}
 
-        {!loading && !error && specialists.length > 0 && (
-          <List>
-            <Section>
-              {specialists.map((spec) => (
-                <Cell
-                  key={spec.name}
-                  before={<span style={{ fontSize: 32 }}>{getEmoji(spec.name)}</span>}
-                  subtitle={spec.description}
-                  after={
-                    <div style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'flex-end',
-                      gap: 4,
-                    }}>
-                      <span style={{
-                        fontSize: 18,
-                        fontWeight: 700,
-                        color: spec.percent >= 70
-                          ? '#34C759'
-                          : spec.percent >= 50
-                            ? '#FF9500'
-                            : 'var(--tg-theme-hint-color, #999)',
-                      }}>
-                        {spec.percent}%
-                      </span>
-                      <div style={{
-                        width: 60,
-                        height: 4,
-                        background: 'var(--tg-theme-secondary-bg-color, #f0f0f0)',
-                        borderRadius: 2,
-                        overflow: 'hidden',
-                      }}>
+        {/* Needs fresh metrics */}
+        {result.needs_fresh_metrics && result.needs_fresh_metrics.length > 0 && (
+          <div style={{
+            margin: '0 16px 20px',
+            padding: 16,
+            background: 'var(--tg-theme-secondary-bg-color, #f4f4f5)',
+            borderRadius: 12,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 10,
+          }}>
+            <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--tg-theme-text-color, #000)' }}>
+              💡 Рекомендуем измерить:
+            </div>
+            <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)' }}>
+              {result.needs_fresh_metrics.join(', ')}
+            </div>
+            <Button size="m" stretched onClick={handleMeasure}>
+              Измерить сейчас
+            </Button>
+          </div>
+        )}
+
+        {/* Specialists */}
+        {result.specialists && result.specialists.length > 0 && (
+          <>
+            <div style={{
+              fontSize: 18,
+              fontWeight: 700,
+              color: 'var(--tg-theme-text-color, #000)',
+              padding: '0 16px',
+              marginBottom: 8,
+            }}>
+              Рекомендуемые специалисты
+            </div>
+            <List>
+              <Section>
+                {result.specialists.map((spec) => (
+                  <Cell
+                    key={spec.name}
+                    before={<span style={{ fontSize: 32 }}>{getEmoji(spec.name)}</span>}
+                    subtitle={spec.description}
+                    after={
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                        <span style={{
+                          fontSize: 18,
+                          fontWeight: 700,
+                          color: spec.percent >= 70 ? '#34C759' : spec.percent >= 50 ? '#FF9500' : 'var(--tg-theme-hint-color, #999)',
+                        }}>
+                          {spec.percent}%
+                        </span>
                         <div style={{
-                          width: `${spec.percent}%`,
-                          height: '100%',
-                          background: spec.percent >= 70
-                            ? '#34C759'
-                            : spec.percent >= 50
-                              ? '#FF9500'
-                              : '#999',
-                          borderRadius: 2,
-                        }} />
+                          width: 60, height: 4,
+                          background: 'var(--tg-theme-secondary-bg-color, #f0f0f0)',
+                          borderRadius: 2, overflow: 'hidden',
+                        }}>
+                          <div style={{
+                            width: `${spec.percent}%`, height: '100%',
+                            background: spec.percent >= 70 ? '#34C759' : spec.percent >= 50 ? '#FF9500' : '#999',
+                            borderRadius: 2,
+                          }} />
+                        </div>
                       </div>
-                    </div>
-                  }
-                >
-                  {spec.name}
-                </Cell>
-              ))}
-            </Section>
-          </List>
+                    }
+                  >
+                    {spec.name}
+                  </Cell>
+                ))}
+              </Section>
+            </List>
+          </>
         )}
 
         <div style={{ flex: 1 }} />
 
         <div style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <Button size="l" stretched onClick={() => {}}>
-            Записаться к врачу
-          </Button>
           <Button size="l" stretched mode="outline" onClick={handleNewConsultation}>
             Новая консультация
           </Button>

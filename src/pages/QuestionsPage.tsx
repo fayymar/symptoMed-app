@@ -1,44 +1,49 @@
-import { useState, useEffect, type FC } from 'react';
+import { useState, type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
-import { sendAnswer, type Question } from '@/api/consultation.ts';
+import { sendAnswers } from '@/api/consultation.ts';
+import { useConsultation } from '@/contexts/ConsultationContext.tsx';
 
 export const QuestionsPage: FC = () => {
   const navigate = useNavigate();
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const { sessionId, questions, answers, setAnswer } = useConsultation();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    const stored = localStorage.getItem('symptoMed_questions');
-    if (stored) {
-      setQuestions(JSON.parse(stored));
-    } else {
-      navigate('/');
-    }
-  }, [navigate]);
+  const userId: number | undefined = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
 
-  if (questions.length === 0) return null;
+  if (questions.length === 0) {
+    navigate('/');
+    return null;
+  }
 
   const current = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
 
   const handleAnswer = async (answer: string) => {
-    const sessionId = localStorage.getItem('symptoMed_sessionId') ?? '';
-    setLoading(true);
-    try {
-      await sendAnswer(sessionId, currentIndex, answer);
-    } catch {
-      // Continue navigation even if API fails
-    } finally {
+    setAnswer(currentIndex, answer);
+
+    const isLast = currentIndex >= questions.length - 1;
+
+    if (isLast) {
+      setLoading(true);
+      setError('');
+      const finalAnswers = [...answers];
+      finalAnswers[currentIndex] = answer;
+      try {
+        await sendAnswers(sessionId, userId ?? 0, finalAnswers);
+      } catch {
+        setError('Ошибка соединения. Попробуйте ещё раз.');
+        setLoading(false);
+        return;
+      }
       setLoading(false);
-    }
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    } else {
       navigate('/duration');
+    } else {
+      setCurrentIndex(currentIndex + 1);
     }
   };
 
@@ -67,11 +72,7 @@ export const QuestionsPage: FC = () => {
           }} />
         </div>
 
-        <div style={{
-          fontSize: 13,
-          color: 'var(--tg-theme-hint-color, #999)',
-          marginBottom: 8,
-        }}>
+        <div style={{ fontSize: 13, color: 'var(--tg-theme-hint-color, #999)', marginBottom: 8 }}>
           Вопрос {currentIndex + 1} из {questions.length}
         </div>
         <div style={{
@@ -83,6 +84,12 @@ export const QuestionsPage: FC = () => {
         }}>
           {current.text}
         </div>
+
+        {error && (
+          <div style={{ marginBottom: 12, fontSize: 14, color: '#ec3942', textAlign: 'center' }}>
+            {error}
+          </div>
+        )}
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
           {current.options.map((option) => (

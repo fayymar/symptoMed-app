@@ -1,17 +1,39 @@
-import { useEffect, type FC } from 'react';
+import { useEffect, useRef, type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Page } from '@/components/Page.tsx';
+import { getResult } from '@/api/consultation.ts';
+import { useConsultation } from '@/contexts/ConsultationContext.tsx';
 
 export const LoadingPage: FC = () => {
   const navigate = useNavigate();
+  const { sessionId, setResult } = useConsultation();
+  const called = useRef(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      navigate('/questions');
-    }, 2500);
-    return () => clearTimeout(timer);
-  }, [navigate]);
+    if (called.current) return;
+    called.current = true;
+
+    if (!sessionId) {
+      navigate('/');
+      return;
+    }
+
+    getResult(sessionId)
+      .then((data) => {
+        setResult({
+          urgency: data.urgency,
+          recommendation: data.recommendation,
+          specialists: data.specialists ?? [],
+          needs_fresh_metrics: data.needs_fresh_metrics ?? [],
+        });
+        navigate('/result');
+      })
+      .catch(() => {
+        // On error still navigate to result — ResultPage will show stored state or error
+        navigate('/result');
+      });
+  }, [sessionId, setResult, navigate]);
 
   return (
     <Page back={false}>

@@ -4,15 +4,18 @@ import { useLaunchParams, useSignal, miniApp } from '@tma.js/sdk-react';
 import { AppRoot } from '@telegram-apps/telegram-ui';
 
 import { routes } from '@/navigation/routes.tsx';
+import { ConsultationProvider } from '@/contexts/ConsultationContext.tsx';
 
 function AppRouter() {
   return (
-    <HashRouter>
-      <Routes>
-        {routes.map((route) => <Route key={route.path} {...route} />)}
-        <Route path="*" element={<Navigate to="/"/>}/>
-      </Routes>
-    </HashRouter>
+    <ConsultationProvider>
+      <HashRouter>
+        <Routes>
+          {routes.map((route) => <Route key={route.path} {...route} />)}
+          <Route path="*" element={<Navigate to="/"/>}/>
+        </Routes>
+      </HashRouter>
+    </ConsultationProvider>
   );
 }
 
