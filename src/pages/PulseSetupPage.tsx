@@ -65,7 +65,7 @@ export const PulseSetupPage: FC = () => {
         {/* Header */}
         <div>
           <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--tg-theme-text-color, #000)', marginBottom: 6 }}>
-            ⚙️ Настройка за 3 шага
+            ⚙️ Настройка за 2 шага
           </div>
           <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)', lineHeight: 1.5 }}>
             После настройки пульс, давление, SpO2 и шаги будут отправляться автоматически
@@ -105,6 +105,9 @@ export const PulseSetupPage: FC = () => {
         {/* Step 2 */}
         <div style={blockStyle}>
           <div style={stepTitleStyle}>📥 Шаг 2: Установите Shortcut</div>
+          <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)', lineHeight: 1.5 }}>
+            При установке iOS попросит ввести ваш Telegram ID — вставьте скопированный ID из шага 1.
+          </div>
           <Button
             size="l"
             stretched
@@ -113,42 +116,8 @@ export const PulseSetupPage: FC = () => {
             Установить Shortcut
           </Button>
           <div style={{ fontSize: 13, color: 'var(--tg-theme-hint-color, #999)', textAlign: 'center' }}>
-            В открывшемся окне нажмите "Добавить команду"
+            Нажмите "Добавить команду" и вставьте ID когда появится запрос
           </div>
-        </div>
-
-        {/* Step 3 */}
-        <div style={blockStyle}>
-          <div style={stepTitleStyle}>🔧 Шаг 3: Вставьте свой ID в Shortcut</div>
-          <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)', lineHeight: 1.5 }}>
-            После установки Shortcut откроется автоматически. Найдите первое действие "Получить входные данные команды" и:
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {[
-              'Нажмите на поле "Если нет входных данных"',
-              'Выберите "Использовать"',
-              'Долгое нажатие на текстовое поле → "Вставить"',
-              'Нажмите "Готово" вверху',
-            ].map((step, i) => (
-              <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <div style={{
-                  minWidth: 24, height: 24, borderRadius: 12,
-                  background: 'var(--tg-theme-button-color, #2481cc)',
-                  color: 'var(--tg-theme-button-text-color, #fff)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 12, fontWeight: 700, flexShrink: 0,
-                }}>
-                  {i + 1}
-                </div>
-                <div style={{ fontSize: 14, color: 'var(--tg-theme-text-color, #000)', lineHeight: 1.5, paddingTop: 3 }}>
-                  {step}
-                </div>
-              </div>
-            ))}
-          </div>
-          <Button size="m" stretched mode="outline" onClick={() => window.open('shortcuts://')}>
-            Открыть приложение Shortcuts
-          </Button>
         </div>
 
         {/* Divider */}
