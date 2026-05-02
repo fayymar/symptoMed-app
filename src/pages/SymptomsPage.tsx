@@ -1,4 +1,4 @@
-import { useState, type FC } from 'react';
+import { useState, useEffect, type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Textarea } from '@telegram-apps/telegram-ui';
 
@@ -14,8 +14,36 @@ export const SymptomsPage: FC = () => {
   const [error, setError] = useState('');
   const [needsMetrics, setNeedsMetrics] = useState<string[]>([]);
   const [pendingNavigate, setPendingNavigate] = useState(false);
+  const [userId, setUserId] = useState<number | undefined>(undefined);
 
-  const userId: number | undefined = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
+  useEffect(() => {
+    const tryGetUserId = () => {
+      const tg = (window as any).Telegram?.WebApp;
+      if (tg) {
+        tg.ready();
+        const id = tg.initDataUnsafe?.user?.id;
+        if (id) {
+          setUserId(id);
+          return true;
+        }
+      }
+      return false;
+    };
+
+    if (!tryGetUserId()) {
+      const interval = setInterval(() => {
+        if (tryGetUserId()) clearInterval(interval);
+      }, 500);
+      const timeout = setTimeout(() => {
+        clearInterval(interval);
+        setError('Не удалось определить пользователя. Закройте и откройте приложение заново.');
+      }, 5000);
+      return () => {
+        clearInterval(interval);
+        clearTimeout(timeout);
+      };
+    }
+  }, []);
 
   const proceed = () => {
     setNeedsMetrics([]);
@@ -24,14 +52,11 @@ export const SymptomsPage: FC = () => {
   };
 
   const handleNext = async () => {
-    if (!userId) {
-      setError('Откройте приложение через бота');
-      return;
-    }
     setLoading(true);
     setError('');
+    console.log('POST /api/consultation/start', { user_id: userId, symptoms });
     try {
-      const data = await startConsultation(userId, symptoms);
+      const data = await startConsultation(userId ?? 0, symptoms);
       saveSymptoms(symptoms);
       setSessionData(
         data.session_id,
@@ -50,8 +75,11 @@ export const SymptomsPage: FC = () => {
       } else {
         navigate('/questions');
       }
-    } catch {
-      setError('Ошибка соединения. Попробуйте ещё раз.');
+    } catch (err) {
+      const msg = 'Ошибка соединения. Попробуйте ещё раз.';
+      console.error('startConsultation error:', err);
+      alert(msg);
+      setError(msg);
     } finally {
       setLoading(false);
     }
