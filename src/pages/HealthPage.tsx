@@ -1,13 +1,17 @@
 import type { FC } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
 
+type SendStatus = 'idle' | 'waiting' | 'success' | 'error';
+
 export const HealthPage: FC = () => {
   const navigate = useNavigate();
   const platform = (window as any).Telegram?.WebApp?.platform;
   const isIOS = platform === 'ios';
+  const [sendStatus, setSendStatus] = useState<SendStatus>('idle');
 
   const handleSendMetrics = () => {
     const userId = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
@@ -15,7 +19,21 @@ export const HealthPage: FC = () => {
       alert('Откройте приложение через бота');
       return;
     }
+
     window.open(`shortcuts://run-shortcut?name=СимптоМед%20-%20Здоровье&input=${userId}`);
+    setSendStatus('waiting');
+
+    setTimeout(() => {
+      fetch(`https://telegram-doctor-bot.onrender.com/api/health/metrics/report/${userId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          setSendStatus('success');
+        })
+        .catch(() => setSendStatus('error'));
+    }, 10000);
   };
 
   return (
@@ -71,9 +89,30 @@ export const HealthPage: FC = () => {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <Button size="l" stretched onClick={handleSendMetrics}>
+              <Button
+                size="l"
+                stretched
+                disabled={sendStatus === 'waiting'}
+                onClick={handleSendMetrics}
+              >
                 📤 Отправить показатели сейчас
               </Button>
+
+              {sendStatus === 'waiting' && (
+                <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)', textAlign: 'center' }}>
+                  ⏳ Отправка...
+                </div>
+              )}
+              {sendStatus === 'success' && (
+                <div style={{ fontSize: 14, color: '#34C759', textAlign: 'center', fontWeight: 500 }}>
+                  ✅ Отчёт отправлен в чат
+                </div>
+              )}
+              {sendStatus === 'error' && (
+                <div style={{ fontSize: 14, color: '#ec3942', textAlign: 'center' }}>
+                  Попробуйте ещё раз
+                </div>
+              )}
 
               <div style={{
                 fontSize: 13,
