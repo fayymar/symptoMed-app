@@ -129,45 +129,6 @@ export const PulseSetupPage: FC = () => {
           <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)', lineHeight: 1.5 }}>
             Хотите чтобы данные отправлялись сами каждый день?
           </div>
-          {/* Info block */}
-          <div style={{
-            background: 'var(--tg-theme-bg-color, #fff)',
-            border: '1px solid var(--tg-theme-secondary-bg-color, #e0e0e0)',
-            borderRadius: 12,
-            padding: '14px 14px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 8,
-          }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--tg-theme-text-color, #000)' }}>
-              ℹ️ Почему именно Telegram?
-            </div>
-            <div style={{ fontSize: 13, color: 'var(--tg-theme-hint-color, #888)', lineHeight: 1.6 }}>
-              Автоматизация срабатывает при открытии Telegram — это значит что показатели отправляются каждый раз когда вы заходите в мессенджер. Это удобно потому что:
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              {[
-                'Вы открываете Telegram несколько раз в день — данные будут актуальными',
-                'Не нужно помнить про отдельное время отправки',
-                'Показатели отправляются незаметно в фоне',
-              ].map((item, i) => (
-                <div key={i} style={{ fontSize: 13, color: 'var(--tg-theme-hint-color, #888)', lineHeight: 1.5, paddingLeft: 4 }}>
-                  — {item}
-                </div>
-              ))}
-            </div>
-            <div style={{
-              fontSize: 13,
-              color: 'var(--tg-theme-hint-color, #888)',
-              lineHeight: 1.6,
-              borderTop: '1px solid var(--tg-theme-secondary-bg-color, #e0e0e0)',
-              paddingTop: 8,
-              marginTop: 4,
-            }}>
-              ⚠️ Важно: автоматизация работает только при разблокированном экране. Если iPhone заблокирован — отправка не произойдёт. Но как только вы разблокируете телефон и откроете Telegram — показатели отправятся автоматически.
-            </div>
-          </div>
-
           <Button
             size="m"
             stretched
@@ -206,6 +167,45 @@ export const PulseSetupPage: FC = () => {
               </div>
             </div>
           )}
+
+          {/* Info block */}
+          <div style={{
+            background: 'var(--tg-theme-bg-color, #fff)',
+            border: '1px solid var(--tg-theme-secondary-bg-color, #e0e0e0)',
+            borderRadius: 12,
+            padding: '14px 14px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+          }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--tg-theme-text-color, #000)' }}>
+              ℹ️ Почему именно Telegram?
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--tg-theme-hint-color, #888)', lineHeight: 1.6 }}>
+              Автоматизация срабатывает при открытии Telegram — это значит что показатели отправляются каждый раз когда вы заходите в мессенджер. Это удобно потому что:
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {[
+                'Вы открываете Telegram несколько раз в день — данные будут актуальными',
+                'Не нужно помнить про отдельное время отправки',
+                'Показатели отправляются незаметно в фоне',
+              ].map((item, i) => (
+                <div key={i} style={{ fontSize: 13, color: 'var(--tg-theme-hint-color, #888)', lineHeight: 1.5, paddingLeft: 4 }}>
+                  — {item}
+                </div>
+              ))}
+            </div>
+            <div style={{
+              fontSize: 13,
+              color: 'var(--tg-theme-hint-color, #888)',
+              lineHeight: 1.6,
+              borderTop: '1px solid var(--tg-theme-secondary-bg-color, #e0e0e0)',
+              paddingTop: 8,
+              marginTop: 4,
+            }}>
+              ⚠️ Важно: автоматизация работает только при разблокированном экране. Если iPhone заблокирован — отправка не произойдёт. Но как только вы разблокируете телефон и откроете Telegram — показатели отправятся автоматически.
+            </div>
+          </div>
         </div>
 
         <Button size="l" stretched mode="outline" onClick={() => navigate('/health')}>
