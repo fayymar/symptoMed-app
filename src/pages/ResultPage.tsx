@@ -1,4 +1,4 @@
-import { type FC } from 'react';
+import { type FC, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Section, Cell, List } from '@telegram-apps/telegram-ui';
 
@@ -27,6 +27,10 @@ export const ResultPage: FC = () => {
   const { result, reset } = useConsultation();
 
   const userId: number | undefined = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
+
+  useEffect(() => {
+    if (result) console.log('result:', result);
+  }, [result]);
 
   const handleNewConsultation = () => {
     reset();
@@ -143,37 +147,40 @@ export const ResultPage: FC = () => {
             </div>
             <List>
               <Section>
-                {result.specialists.map((spec) => (
-                  <Cell
-                    key={spec.name}
-                    before={<span style={{ fontSize: 32 }}>{getEmoji(spec.name)}</span>}
-                    subtitle={spec.description}
-                    after={
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-                        <span style={{
-                          fontSize: 18,
-                          fontWeight: 700,
-                          color: spec.percent >= 70 ? '#34C759' : spec.percent >= 50 ? '#FF9500' : 'var(--tg-theme-hint-color, #999)',
-                        }}>
-                          {spec.percent}%
-                        </span>
-                        <div style={{
-                          width: 60, height: 4,
-                          background: 'var(--tg-theme-secondary-bg-color, #f0f0f0)',
-                          borderRadius: 2, overflow: 'hidden',
-                        }}>
+                {result.specialists.map((spec) => {
+                  const pct = spec.percentage ?? spec.percent ?? 0;
+                  return (
+                    <Cell
+                      key={spec.name}
+                      before={<span style={{ fontSize: 32 }}>{getEmoji(spec.name)}</span>}
+                      subtitle={spec.description}
+                      after={
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                          <span style={{
+                            fontSize: 18,
+                            fontWeight: 700,
+                            color: pct >= 70 ? '#34C759' : pct >= 50 ? '#FF9500' : 'var(--tg-theme-hint-color, #999)',
+                          }}>
+                            {pct}%
+                          </span>
                           <div style={{
-                            width: `${spec.percent}%`, height: '100%',
-                            background: spec.percent >= 70 ? '#34C759' : spec.percent >= 50 ? '#FF9500' : '#999',
-                            borderRadius: 2,
-                          }} />
+                            width: 60, height: 4,
+                            background: 'var(--tg-theme-secondary-bg-color, #f0f0f0)',
+                            borderRadius: 2, overflow: 'hidden',
+                          }}>
+                            <div style={{
+                              width: `${pct}%`, height: '100%',
+                              background: pct >= 70 ? '#34C759' : pct >= 50 ? '#FF9500' : '#999',
+                              borderRadius: 2,
+                            }} />
+                          </div>
                         </div>
-                      </div>
-                    }
-                  >
-                    {spec.name}
-                  </Cell>
-                ))}
+                      }
+                    >
+                      {spec.name}
+                    </Cell>
+                  );
+                })}
               </Section>
             </List>
           </>

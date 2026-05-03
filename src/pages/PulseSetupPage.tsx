@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@telegram-apps/telegram-ui';
 
@@ -24,9 +24,27 @@ const AUTOMATION_STEPS = [
 
 export const PulseSetupPage: FC = () => {
   const navigate = useNavigate();
-  const userId = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
+  const [userId, setUserId] = useState<number | undefined>(
+    (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id,
+  );
   const [copied, setCopied] = useState(false);
   const [automationOpen, setAutomationOpen] = useState(false);
+
+  useEffect(() => {
+    if (userId) return;
+    let attempts = 0;
+    const interval = setInterval(() => {
+      const id = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
+      if (id) {
+        setUserId(id);
+        clearInterval(interval);
+      } else {
+        attempts++;
+        if (attempts >= 10) clearInterval(interval);
+      }
+    }, 500);
+    return () => clearInterval(interval);
+  }, [userId]);
 
   const handleCopy = () => {
     if (!userId) return;
@@ -96,8 +114,8 @@ export const PulseSetupPage: FC = () => {
               </Button>
             </>
           ) : (
-            <div style={{ fontSize: 14, color: '#ec3942', textAlign: 'center' }}>
-              Откройте через бота
+            <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)', textAlign: 'center', lineHeight: 1.6 }}>
+              Не удалось определить ID автоматически. Чтобы узнать свой Telegram ID, отправьте боту <span style={{ fontWeight: 600, color: 'var(--tg-theme-text-color, #000)' }}>@medgg_bot</span> команду <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>/start</span> — бот ответит вашим ID.
             </div>
           )}
         </div>

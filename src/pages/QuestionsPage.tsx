@@ -1,6 +1,6 @@
 import { useState, type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@telegram-apps/telegram-ui';
+import { Button, Textarea } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
 import { sendAnswers } from '@/api/consultation.ts';
@@ -10,6 +10,9 @@ export const QuestionsPage: FC = () => {
   const navigate = useNavigate();
   const { sessionId, questions, answers, setAnswer } = useConsultation();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedOptions, setSelectedOptions] = useState<Set<string>>(new Set());
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [customText, setCustomText] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -23,16 +26,33 @@ export const QuestionsPage: FC = () => {
   const current = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
 
-  const handleAnswer = async (answer: string) => {
-    setAnswer(currentIndex, answer);
+  const toggleOption = (option: string) => {
+    setSelectedOptions((prev) => {
+      const next = new Set(prev);
+      if (next.has(option)) next.delete(option);
+      else next.add(option);
+      return next;
+    });
+  };
 
+  const getAnswerValue = (): string => {
+    const parts: string[] = [];
+    if (selectedOptions.size > 0) parts.push(...Array.from(selectedOptions));
+    if (customText.trim()) parts.push(customText.trim());
+    return parts.join(', ');
+  };
+
+  const canProceed = selectedOptions.size > 0 || customText.trim().length > 0;
+
+  const goNext = async (answerValue: string) => {
+    setAnswer(currentIndex, answerValue);
     const isLast = currentIndex >= questions.length - 1;
 
     if (isLast) {
       setLoading(true);
       setError('');
       const finalAnswers = [...answers];
-      finalAnswers[currentIndex] = answer;
+      finalAnswers[currentIndex] = answerValue;
       try {
         await sendAnswers(sessionId, userId ?? 0, finalAnswers);
       } catch {
@@ -44,8 +64,13 @@ export const QuestionsPage: FC = () => {
       navigate('/duration');
     } else {
       setCurrentIndex(currentIndex + 1);
+      setSelectedOptions(new Set());
+      setShowCustomInput(false);
+      setCustomText('');
     }
   };
+
+  const handleNext = () => goNext(getAnswerValue());
 
   return (
     <Page back={true}>
@@ -79,10 +104,13 @@ export const QuestionsPage: FC = () => {
           fontSize: 20,
           fontWeight: 600,
           color: 'var(--tg-theme-text-color, #000)',
-          marginBottom: 24,
+          marginBottom: 8,
           lineHeight: 1.4,
         }}>
           {current.text}
+        </div>
+        <div style={{ fontSize: 13, color: 'var(--tg-theme-hint-color, #999)', marginBottom: 16 }}>
+          Можно выбрать несколько вариантов
         </div>
 
         {error && (
@@ -92,29 +120,52 @@ export const QuestionsPage: FC = () => {
         )}
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
-          {current.options.map((option) => (
+          {current.options.map((option) => {
+            const isSelected = selectedOptions.has(option);
+            return (
+              <Button
+                key={option}
+                size="m"
+                stretched
+                mode={isSelected ? 'filled' : 'outline'}
+                disabled={loading}
+                onClick={() => toggleOption(option)}
+              >
+                {isSelected ? `✓ ${option}` : option}
+              </Button>
+            );
+          })}
+
+          {showCustomInput ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
+              <Textarea
+                placeholder="Опишите своё..."
+                value={customText}
+                onChange={(e) => setCustomText(e.target.value)}
+                style={{ minHeight: 80 }}
+              />
+            </div>
+          ) : (
             <Button
-              key={option}
               size="m"
               stretched
-              mode="outline"
+              mode="plain"
               disabled={loading}
-              onClick={() => handleAnswer(option)}
+              onClick={() => setShowCustomInput(true)}
             >
-              {option}
+              ✏️ Написать своё
             </Button>
-          ))}
+          )}
         </div>
 
         <div style={{ paddingTop: 16 }}>
           <Button
-            size="m"
+            size="l"
             stretched
-            mode="plain"
-            disabled={loading}
-            onClick={() => handleAnswer('Другое')}
+            disabled={!canProceed || loading}
+            onClick={handleNext}
           >
-            Написать своё
+            {loading ? 'Загрузка...' : 'Далее'}
           </Button>
         </div>
       </div>

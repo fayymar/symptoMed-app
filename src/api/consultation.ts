@@ -8,7 +8,8 @@ export interface Question {
 export interface Specialist {
   name: string;
   description: string;
-  percent: number;
+  percent?: number;
+  percentage?: number;
 }
 
 export interface StartResponse {
