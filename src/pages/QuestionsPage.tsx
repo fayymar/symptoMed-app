@@ -25,6 +25,7 @@ export const QuestionsPage: FC = () => {
 
   const current = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
+  console.log('current question:', current);
 
   const toggleOption = (option: string) => {
     setSelectedOptions((prev) => {
@@ -102,12 +103,12 @@ export const QuestionsPage: FC = () => {
         </div>
         <div style={{
           fontSize: 20,
-          fontWeight: 600,
+          fontWeight: 700,
           color: 'var(--tg-theme-text-color, #000)',
-          marginBottom: 8,
+          marginBottom: 16,
           lineHeight: 1.4,
         }}>
-          {current.text}
+          {(current as any).text || (current as any).question || (current as any).content || JSON.stringify(current)}
         </div>
         <div style={{ fontSize: 13, color: 'var(--tg-theme-hint-color, #999)', marginBottom: 16 }}>
           Можно выбрать несколько вариантов
