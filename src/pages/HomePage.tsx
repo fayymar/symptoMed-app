@@ -67,6 +67,14 @@ export const HomePage: FC = () => {
           >
             🩺 Здоровье с Apple Watch
           </Button>
+          <Button
+            size="l"
+            stretched
+            mode="outline"
+            onClick={() => navigate('/profile')}
+          >
+            👤 Профиль
+          </Button>
         </div>
       </div>
     </Page>

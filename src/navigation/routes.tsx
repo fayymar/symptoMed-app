@@ -11,6 +11,7 @@ import { HealthPage } from '@/pages/HealthPage.tsx';
 import { MetricHistoryPage } from '@/pages/MetricHistoryPage.tsx';
 import { BloodPressurePage } from '@/pages/BloodPressurePage.tsx';
 import { PulseSetupPage } from '@/pages/PulseSetupPage.tsx';
+import { ProfilePage } from '@/pages/ProfilePage.tsx';
 
 const RedirectToHeartrate = () => <Navigate to="/metrics/heartrate" replace />;
 const RedirectToHealth = () => <Navigate to="/health" replace />;
@@ -31,6 +32,7 @@ export const routes: Route[] = [
   { path: '/metrics/blood-pressure', Component: BloodPressurePage },
   { path: '/metrics/:type', Component: MetricHistoryPage },
   { path: '/pulse-setup', Component: PulseSetupPage },
+  { path: '/profile', Component: ProfilePage },
   { path: '/heartrate', Component: RedirectToHeartrate },
   { path: '/pulse', Component: RedirectToHealth },
 ];

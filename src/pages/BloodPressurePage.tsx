@@ -23,26 +23,19 @@ function getStatus(systolic: number, diastolic: number): { label: string; color:
   return { label: 'Норма', color: '#34C759' };
 }
 
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr);
+function formatDate(utcString: string): string {
+  const date = new Date(utcString.endsWith('Z') ? utcString : utcString + 'Z');
   const now = new Date();
-  const time = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-
-  const isToday =
-    date.getDate() === now.getDate() &&
-    date.getMonth() === now.getMonth() &&
-    date.getFullYear() === now.getFullYear();
-
+  const isToday = date.toLocaleDateString() === now.toLocaleDateString();
   const yesterday = new Date(now);
-  yesterday.setDate(now.getDate() - 1);
-  const isYesterday =
-    date.getDate() === yesterday.getDate() &&
-    date.getMonth() === yesterday.getMonth() &&
-    date.getFullYear() === yesterday.getFullYear();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const isYesterday = date.toLocaleDateString() === yesterday.toLocaleDateString();
+
+  const time = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
 
   if (isToday) return `Сегодня ${time}`;
   if (isYesterday) return `Вчера ${time}`;
-  return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) + ' ' + time;
+  return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) + ` ${time}`;
 }
 
 function mergeRecords(systolicRecords: BPRecord[], diastolicRecords: BPRecord[]): BPMeasurement[] {
