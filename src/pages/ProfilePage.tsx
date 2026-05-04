@@ -8,11 +8,17 @@ const BASE_URL = 'https://telegram-doctor-bot.onrender.com/api/profile';
 
 interface ProfileData {
   name: string;
-  birth_date: string;
-  gender: 'male' | 'female' | '';
+  date_of_birth: string;
+  sex: 'male' | 'female' | '';
   height: string;
   weight: string;
   phone: string;
+}
+
+function toDateInputValue(raw: string | null | undefined): string {
+  if (!raw) return '';
+  // Take just the YYYY-MM-DD part (handles both "1990-01-15" and "1990-01-15T00:00:00")
+  return raw.slice(0, 10);
 }
 
 export const ProfilePage: FC = () => {
@@ -23,11 +29,12 @@ export const ProfilePage: FC = () => {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
+  const [profileExists, setProfileExists] = useState(false);
 
   const [profile, setProfile] = useState<ProfileData>({
     name: '',
-    birth_date: '',
-    gender: '',
+    date_of_birth: '',
+    sex: '',
     height: '',
     weight: '',
     phone: '',
@@ -44,14 +51,17 @@ export const ProfilePage: FC = () => {
         return res.json();
       })
       .then((data) => {
-        setProfile({
-          name: data.name ?? '',
-          birth_date: data.birth_date ?? '',
-          gender: data.gender ?? '',
-          height: data.height != null ? String(data.height) : '',
-          weight: data.weight != null ? String(data.weight) : '',
-          phone: data.phone ?? '',
-        });
+        if (data.exists === true) {
+          setProfileExists(true);
+          setProfile({
+            name: data.name ?? '',
+            date_of_birth: toDateInputValue(data.date_of_birth),
+            sex: data.sex ?? '',
+            height: data.height != null ? String(data.height) : '',
+            weight: data.weight != null ? String(data.weight) : '',
+            phone: data.phone ?? '',
+          });
+        }
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -65,15 +75,16 @@ export const ProfilePage: FC = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: profile.name,
-          birth_date: profile.birth_date,
-          gender: profile.gender,
+          name: profile.name || null,
+          date_of_birth: profile.date_of_birth || null,
+          sex: profile.sex || null,
           height: profile.height ? Number(profile.height) : null,
           weight: profile.weight ? Number(profile.weight) : null,
-          phone: profile.phone,
+          phone: profile.phone || null,
         }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setProfileExists(true);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch {
@@ -140,6 +151,20 @@ export const ProfilePage: FC = () => {
           </div>
         </div>
 
+        {/* Info block — only when profile is filled */}
+        {profileExists && (
+          <div style={{
+            background: 'var(--tg-theme-secondary-bg-color, #f4f4f5)',
+            borderRadius: 12,
+            padding: '12px 14px',
+            fontSize: 13,
+            color: 'var(--tg-theme-hint-color, #888)',
+            lineHeight: 1.6,
+          }}>
+            ℹ️ Данные профиля используются AI при диагностике для более точных рекомендаций с учётом вашего возраста, пола и физических параметров.
+          </div>
+        )}
+
         {/* Name */}
         <div style={fieldBlock}>
           <div style={labelStyle}>Имя</div>
@@ -156,8 +181,8 @@ export const ProfilePage: FC = () => {
           <div style={labelStyle}>Дата рождения</div>
           <Input
             type="date"
-            value={profile.birth_date}
-            onChange={(e) => setProfile({ ...profile, birth_date: e.target.value })}
+            value={profile.date_of_birth}
+            onChange={(e) => setProfile({ ...profile, date_of_birth: e.target.value })}
           />
         </div>
 
@@ -168,20 +193,20 @@ export const ProfilePage: FC = () => {
             <button
               style={{
                 ...toggleBtnBase,
-                background: profile.gender === 'male' ? 'var(--tg-theme-button-color, #2481cc)' : 'transparent',
-                color: profile.gender === 'male' ? 'var(--tg-theme-button-text-color, #fff)' : 'var(--tg-theme-button-color, #2481cc)',
+                background: profile.sex === 'male' ? 'var(--tg-theme-button-color, #2481cc)' : 'transparent',
+                color: profile.sex === 'male' ? 'var(--tg-theme-button-text-color, #fff)' : 'var(--tg-theme-button-color, #2481cc)',
               }}
-              onClick={() => setProfile({ ...profile, gender: 'male' })}
+              onClick={() => setProfile({ ...profile, sex: 'male' })}
             >
               Мужской
             </button>
             <button
               style={{
                 ...toggleBtnBase,
-                background: profile.gender === 'female' ? 'var(--tg-theme-button-color, #2481cc)' : 'transparent',
-                color: profile.gender === 'female' ? 'var(--tg-theme-button-text-color, #fff)' : 'var(--tg-theme-button-color, #2481cc)',
+                background: profile.sex === 'female' ? 'var(--tg-theme-button-color, #2481cc)' : 'transparent',
+                color: profile.sex === 'female' ? 'var(--tg-theme-button-text-color, #fff)' : 'var(--tg-theme-button-color, #2481cc)',
               }}
-              onClick={() => setProfile({ ...profile, gender: 'female' })}
+              onClick={() => setProfile({ ...profile, sex: 'female' })}
             >
               Женский
             </button>

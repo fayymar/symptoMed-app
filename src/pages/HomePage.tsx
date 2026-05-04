@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { useState, useEffect, type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@telegram-apps/telegram-ui';
 
@@ -6,6 +6,28 @@ import { Page } from '@/components/Page.tsx';
 
 export const HomePage: FC = () => {
   const navigate = useNavigate();
+  const [profileIncomplete, setProfileIncomplete] = useState(false);
+
+  useEffect(() => {
+    const userId = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
+    if (!userId) return;
+
+    fetch(`https://telegram-doctor-bot.onrender.com/api/profile/${userId}`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        const incomplete =
+          !data.exists ||
+          !data.date_of_birth ||
+          !data.sex ||
+          data.height == null ||
+          data.weight == null;
+        setProfileIncomplete(incomplete);
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <Page back={false}>
@@ -67,14 +89,26 @@ export const HomePage: FC = () => {
           >
             🩺 Здоровье с Apple Watch
           </Button>
-          <Button
-            size="l"
-            stretched
-            mode="outline"
-            onClick={() => navigate('/profile')}
-          >
-            👤 Профиль
-          </Button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <Button
+              size="l"
+              stretched
+              mode="outline"
+              onClick={() => navigate('/profile')}
+            >
+              👤 Профиль
+            </Button>
+            {profileIncomplete && (
+              <div style={{
+                fontSize: 12,
+                color: '#ec3942',
+                textAlign: 'center',
+                paddingTop: 2,
+              }}>
+                Заполните для точной диагностики
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </Page>
