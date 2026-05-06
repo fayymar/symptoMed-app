@@ -51,15 +51,17 @@ export const ProfilePage: FC = () => {
         return res.json();
       })
       .then((data) => {
+        console.log(data);
         if (data.exists === true) {
           setProfileExists(true);
+          const p = data.profile;
           setProfile({
-            full_name: data.full_name ?? '',
-            birthdate: toDateInputValue(data.birthdate),
-            gender: data.gender ?? '',
-            height: data.height != null ? String(data.height) : '',
-            weight: data.weight != null ? String(data.weight) : '',
-            phone: data.phone ?? '',
+            full_name: p.full_name ?? '',
+            birthdate: toDateInputValue(p.birthdate),
+            gender: p.gender ?? '',
+            height: p.height != null ? String(p.height) : '',
+            weight: p.weight != null ? String(p.weight) : '',
+            phone: p.phone ?? '',
           });
         }
       })
