@@ -4,6 +4,7 @@ import { Button, Section, Cell, List } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
 import { useConsultation } from '@/contexts/ConsultationContext.tsx';
+import { useUserId } from '../hooks/useUserId';
 
 const SPECIALIST_EMOJI: Record<string, string> = {
   'Терапевт': '👨‍⚕️',
@@ -26,7 +27,7 @@ export const ResultPage: FC = () => {
   const navigate = useNavigate();
   const { result, reset } = useConsultation();
 
-  const userId: number | undefined = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
+  const userId = useUserId();
 
   useEffect(() => {
     if (result) console.log('result:', result);

@@ -1,10 +1,11 @@
-import { useState, useEffect, type FC } from 'react';
+import { useState, type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Textarea } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
 import { startConsultation } from '@/api/consultation.ts';
 import { useConsultation } from '@/contexts/ConsultationContext.tsx';
+import { useUserId } from '../hooks/useUserId';
 
 export const SymptomsPage: FC = () => {
   const navigate = useNavigate();
@@ -14,36 +15,7 @@ export const SymptomsPage: FC = () => {
   const [error, setError] = useState('');
   const [needsMetrics, setNeedsMetrics] = useState<string[]>([]);
   const [pendingNavigate, setPendingNavigate] = useState(false);
-  const [userId, setUserId] = useState<number | undefined>(undefined);
-
-  useEffect(() => {
-    const tryGetUserId = () => {
-      const tg = (window as any).Telegram?.WebApp;
-      if (tg) {
-        tg.ready();
-        const id = tg.initDataUnsafe?.user?.id;
-        if (id) {
-          setUserId(id);
-          return true;
-        }
-      }
-      return false;
-    };
-
-    if (!tryGetUserId()) {
-      const interval = setInterval(() => {
-        if (tryGetUserId()) clearInterval(interval);
-      }, 500);
-      const timeout = setTimeout(() => {
-        clearInterval(interval);
-        setError('Не удалось определить пользователя. Закройте и откройте приложение заново.');
-      }, 5000);
-      return () => {
-        clearInterval(interval);
-        clearTimeout(timeout);
-      };
-    }
-  }, []);
+  const userId = useUserId();
 
   const proceed = () => {
     setNeedsMetrics([]);

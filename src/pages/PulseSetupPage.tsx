@@ -1,9 +1,10 @@
 import type { FC } from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
+import { useUserId } from '../hooks/useUserId';
 
 const AUTOMATION_STEPS = [
   'Откройте Быстрые команды на iPhone',
@@ -22,39 +23,11 @@ const AUTOMATION_STEPS = [
   'Нажмите "Готово"',
 ];
 
-function getUrlUserId(): number | undefined {
-  const params = new URLSearchParams(window.location.search);
-  const raw = params.get('userId') ?? params.get('user_id') ?? params.get('id');
-  if (raw) {
-    const n = Number(raw);
-    if (!isNaN(n) && n > 0) return n;
-  }
-  return undefined;
-}
-
 export const PulseSetupPage: FC = () => {
   const navigate = useNavigate();
-  const [userId, setUserId] = useState<number | undefined>(
-    (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id ?? getUrlUserId(),
-  );
+  const userId = useUserId();
   const [copied, setCopied] = useState(false);
   const [automationOpen, setAutomationOpen] = useState(false);
-
-  useEffect(() => {
-    if (userId) return;
-    let attempts = 0;
-    const interval = setInterval(() => {
-      const id = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id ?? getUrlUserId();
-      if (id) {
-        setUserId(id);
-        clearInterval(interval);
-      } else {
-        attempts++;
-        if (attempts >= 10) clearInterval(interval);
-      }
-    }, 500);
-    return () => clearInterval(interval);
-  }, [userId]);
 
   const handleCopy = () => {
     if (!userId) return;

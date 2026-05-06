@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
+import { useUserId } from '../hooks/useUserId';
 
 type SendStatus = 'idle' | 'waiting' | 'success' | 'error';
 
@@ -12,9 +13,9 @@ export const HealthPage: FC = () => {
   const platform = (window as any).Telegram?.WebApp?.platform;
   const isIOS = platform === 'ios';
   const [sendStatus, setSendStatus] = useState<SendStatus>('idle');
+  const userId = useUserId();
 
   const handleSendMetrics = () => {
-    const userId = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
     if (!userId) {
       alert('Откройте приложение через бота');
       return;

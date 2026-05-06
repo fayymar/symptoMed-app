@@ -3,13 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
+import { useUserId } from '../hooks/useUserId';
 
 export const HomePage: FC = () => {
   const navigate = useNavigate();
+  const userId = useUserId();
   const [profileIncomplete, setProfileIncomplete] = useState(false);
 
   useEffect(() => {
-    const userId = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
     if (!userId) return;
 
     fetch(`https://telegram-doctor-bot.onrender.com/api/profile/${userId}`)
@@ -27,7 +28,7 @@ export const HomePage: FC = () => {
         setProfileIncomplete(incomplete);
       })
       .catch(() => {});
-  }, []);
+  }, [userId]);
 
   return (
     <Page back={false}>

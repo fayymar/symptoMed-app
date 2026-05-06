@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Input } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
+import { useUserId } from '../hooks/useUserId';
 
 const BASE_URL = 'https://telegram-doctor-bot.onrender.com/api/profile';
 
@@ -23,7 +24,7 @@ function toDateInputValue(raw: string | null | undefined): string {
 
 export const ProfilePage: FC = () => {
   const navigate = useNavigate();
-  const userId = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
+  const userId = useUserId();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

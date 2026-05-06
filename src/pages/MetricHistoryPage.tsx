@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Section, Cell, List, Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
+import { useUserId } from '../hooks/useUserId';
 
 interface MetricRecord {
   value: number;
@@ -90,7 +91,7 @@ export const MetricHistoryPage: FC = () => {
   const navigate = useNavigate();
   const config = type ? METRICS_CONFIG[type] : undefined;
 
-  const userId = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
+  const userId = useUserId();
   const [records, setRecords] = useState<MetricRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

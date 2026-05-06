@@ -5,6 +5,7 @@ import { Button, Textarea } from '@telegram-apps/telegram-ui';
 import { Page } from '@/components/Page.tsx';
 import { sendAnswers } from '@/api/consultation.ts';
 import { useConsultation } from '@/contexts/ConsultationContext.tsx';
+import { useUserId } from '../hooks/useUserId';
 
 export const QuestionsPage: FC = () => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ export const QuestionsPage: FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const userId: number | undefined = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
+  const userId = useUserId();
 
   if (questions.length === 0) {
     navigate('/');

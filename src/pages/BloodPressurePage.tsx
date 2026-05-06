@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Section, Cell, List, Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
+import { useUserId } from '../hooks/useUserId';
 
 interface BPRecord {
   value: number;
@@ -60,7 +61,7 @@ function mergeRecords(systolicRecords: BPRecord[], diastolicRecords: BPRecord[])
 
 export const BloodPressurePage: FC = () => {
   const navigate = useNavigate();
-  const userId = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
+  const userId = useUserId();
 
   const [measurements, setMeasurements] = useState<BPMeasurement[]>([]);
   const [loading, setLoading] = useState(true);
