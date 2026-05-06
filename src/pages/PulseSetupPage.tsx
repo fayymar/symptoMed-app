@@ -22,10 +22,20 @@ const AUTOMATION_STEPS = [
   'Нажмите "Готово"',
 ];
 
+function getUrlUserId(): number | undefined {
+  const params = new URLSearchParams(window.location.search);
+  const raw = params.get('userId') ?? params.get('user_id') ?? params.get('id');
+  if (raw) {
+    const n = Number(raw);
+    if (!isNaN(n) && n > 0) return n;
+  }
+  return undefined;
+}
+
 export const PulseSetupPage: FC = () => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState<number | undefined>(
-    (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id,
+    (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id ?? getUrlUserId(),
   );
   const [copied, setCopied] = useState(false);
   const [automationOpen, setAutomationOpen] = useState(false);
@@ -34,7 +44,7 @@ export const PulseSetupPage: FC = () => {
     if (userId) return;
     let attempts = 0;
     const interval = setInterval(() => {
-      const id = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
+      const id = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id ?? getUrlUserId();
       if (id) {
         setUserId(id);
         clearInterval(interval);
@@ -114,8 +124,17 @@ export const PulseSetupPage: FC = () => {
               </Button>
             </>
           ) : (
-            <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)', textAlign: 'center', lineHeight: 1.6 }}>
-              Не удалось определить ID автоматически. Чтобы узнать свой Telegram ID, отправьте боту <span style={{ fontWeight: 600, color: 'var(--tg-theme-text-color, #000)' }}>@medgg_bot</span> команду <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>/start</span> — бот ответит вашим ID.
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)', textAlign: 'center', lineHeight: 1.6 }}>
+                Не удалось определить ID автоматически. Откройте бота и отправьте команду <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>/start</span> — бот ответит вашим ID.
+              </div>
+              <Button
+                size="l"
+                stretched
+                onClick={() => window.open('https://t.me/medgg_bot', '_blank')}
+              >
+                Открыть бота
+              </Button>
             </div>
           )}
         </div>

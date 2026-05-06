@@ -7,9 +7,9 @@ import { Page } from '@/components/Page.tsx';
 const BASE_URL = 'https://telegram-doctor-bot.onrender.com/api/profile';
 
 interface ProfileData {
-  name: string;
-  date_of_birth: string;
-  sex: 'male' | 'female' | '';
+  full_name: string;
+  birthdate: string;
+  gender: 'male' | 'female' | '';
   height: string;
   weight: string;
   phone: string;
@@ -32,9 +32,9 @@ export const ProfilePage: FC = () => {
   const [profileExists, setProfileExists] = useState(false);
 
   const [profile, setProfile] = useState<ProfileData>({
-    name: '',
-    date_of_birth: '',
-    sex: '',
+    full_name: '',
+    birthdate: '',
+    gender: '',
     height: '',
     weight: '',
     phone: '',
@@ -54,9 +54,9 @@ export const ProfilePage: FC = () => {
         if (data.exists === true) {
           setProfileExists(true);
           setProfile({
-            name: data.name ?? '',
-            date_of_birth: toDateInputValue(data.date_of_birth),
-            sex: data.sex ?? '',
+            full_name: data.full_name ?? '',
+            birthdate: toDateInputValue(data.birthdate),
+            gender: data.gender ?? '',
             height: data.height != null ? String(data.height) : '',
             weight: data.weight != null ? String(data.weight) : '',
             phone: data.phone ?? '',
@@ -75,9 +75,9 @@ export const ProfilePage: FC = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: profile.name || null,
-          date_of_birth: profile.date_of_birth || null,
-          sex: profile.sex || null,
+          full_name: profile.full_name || null,
+          birthdate: profile.birthdate || null,
+          gender: profile.gender || null,
           height: profile.height ? Number(profile.height) : null,
           weight: profile.weight ? Number(profile.weight) : null,
           phone: profile.phone || null,
@@ -171,8 +171,8 @@ export const ProfilePage: FC = () => {
           <Input
             type="text"
             placeholder="Ваше имя"
-            value={profile.name}
-            onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+            value={profile.full_name}
+            onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
           />
         </div>
 
@@ -181,8 +181,8 @@ export const ProfilePage: FC = () => {
           <div style={labelStyle}>Дата рождения</div>
           <Input
             type="date"
-            value={profile.date_of_birth}
-            onChange={(e) => setProfile({ ...profile, date_of_birth: e.target.value })}
+            value={profile.birthdate}
+            onChange={(e) => setProfile({ ...profile, birthdate: e.target.value })}
           />
         </div>
 
@@ -193,20 +193,20 @@ export const ProfilePage: FC = () => {
             <button
               style={{
                 ...toggleBtnBase,
-                background: profile.sex === 'male' ? 'var(--tg-theme-button-color, #2481cc)' : 'transparent',
-                color: profile.sex === 'male' ? 'var(--tg-theme-button-text-color, #fff)' : 'var(--tg-theme-button-color, #2481cc)',
+                background: profile.gender === 'male' ? 'var(--tg-theme-button-color, #2481cc)' : 'transparent',
+                color: profile.gender === 'male' ? 'var(--tg-theme-button-text-color, #fff)' : 'var(--tg-theme-button-color, #2481cc)',
               }}
-              onClick={() => setProfile({ ...profile, sex: 'male' })}
+              onClick={() => setProfile({ ...profile, gender: 'male' })}
             >
               Мужской
             </button>
             <button
               style={{
                 ...toggleBtnBase,
-                background: profile.sex === 'female' ? 'var(--tg-theme-button-color, #2481cc)' : 'transparent',
-                color: profile.sex === 'female' ? 'var(--tg-theme-button-text-color, #fff)' : 'var(--tg-theme-button-color, #2481cc)',
+                background: profile.gender === 'female' ? 'var(--tg-theme-button-color, #2481cc)' : 'transparent',
+                color: profile.gender === 'female' ? 'var(--tg-theme-button-text-color, #fff)' : 'var(--tg-theme-button-color, #2481cc)',
               }}
-              onClick={() => setProfile({ ...profile, sex: 'female' })}
+              onClick={() => setProfile({ ...profile, gender: 'female' })}
             >
               Женский
             </button>
