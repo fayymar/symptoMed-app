@@ -1,34 +1,11 @@
-import { useState, useEffect, type FC } from 'react';
+import { type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
-import { useUserId } from '../hooks/useUserId';
 
 export const HomePage: FC = () => {
   const navigate = useNavigate();
-  const userId = useUserId();
-  const [profileIncomplete, setProfileIncomplete] = useState(false);
-
-  useEffect(() => {
-    if (!userId) return;
-
-    fetch(`https://telegram-doctor-bot.onrender.com/api/profile/${userId}`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        const incomplete =
-          !data.exists ||
-          !data.date_of_birth ||
-          !data.sex ||
-          data.height == null ||
-          data.weight == null;
-        setProfileIncomplete(incomplete);
-      })
-      .catch(() => {});
-  }, [userId]);
 
   return (
     <Page back={false}>
@@ -67,49 +44,24 @@ export const HomePage: FC = () => {
         </div>
 
         <div style={{ paddingBottom: 32, display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <Button
-            size="l"
-            stretched
-            onClick={() => navigate('/symptoms')}
-          >
+          <Button size="l" stretched onClick={() => navigate('/symptoms')}>
             Начать консультацию
           </Button>
-          <Button
-            size="l"
-            stretched
-            mode="outline"
-            onClick={() => {}}
-          >
+          <Button size="l" stretched mode="outline" onClick={() => navigate('/history')}>
             История консультаций
           </Button>
-          <Button
-            size="l"
-            stretched
-            mode="outline"
-            onClick={() => navigate('/health')}
-          >
+          <Button size="l" stretched mode="outline" onClick={() => navigate('/health')}>
             🩺 Здоровье с Apple Watch
           </Button>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <Button
-              size="l"
-              stretched
-              mode="outline"
-              onClick={() => navigate('/profile')}
-            >
-              👤 Профиль
-            </Button>
-            {profileIncomplete && (
-              <div style={{
-                fontSize: 12,
-                color: '#ec3942',
-                textAlign: 'center',
-                paddingTop: 2,
-              }}>
-                Заполните для точной диагностики
-              </div>
-            )}
-          </div>
+          <Button size="l" stretched mode="outline" onClick={() => navigate('/profile')}>
+            👤 Профиль
+          </Button>
+          <Button size="l" stretched mode="outline" onClick={() => navigate('/clinics')}>
+            🏥 Клиники
+          </Button>
+          <Button size="l" stretched mode="outline" onClick={() => navigate('/help')}>
+            ℹ️ Помощь
+          </Button>
         </div>
       </div>
     </Page>

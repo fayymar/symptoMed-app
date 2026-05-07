@@ -1,33 +1,34 @@
 import type { FC } from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
 import { useUserId } from '../hooks/useUserId';
 
-const AUTOMATION_STEPS = [
-  'Откройте Быстрые команды на iPhone',
-  'Перейдите на вкладку "Автоматизация" внизу',
-  'Нажмите "+" в правом верхнем углу',
-  'Выберите "Создать персональную автоматизацию"',
-  'Выберите триггер "Приложение"',
-  'Нажмите "Выбрать" и найдите "Telegram"',
-  'Оставьте галочку "Открыто"',
-  'Нажмите "Далее"',
-  'Нажмите "Добавить действие"',
-  'В поиске введите "Запустить быструю команду"',
-  'Выберите "СимптоМед — Здоровье"',
-  'Нажмите "Далее"',
-  'Выключите "Спрашивать перед запуском"',
-  'Нажмите "Готово"',
-];
+const SHORTCUT_URL = 'https://www.icloud.com/shortcuts/5803e08e3cf147908cae4e582fc45194';
+
+const METRIC_LABELS: Record<string, string> = {
+  heartrate: 'пульс',
+  blood_pressure: 'давление',
+  spo2: 'SpO2',
+  steps: 'шаги',
+};
 
 export const PulseSetupPage: FC = () => {
   const navigate = useNavigate();
   const userId = useUserId();
   const [copied, setCopied] = useState(false);
-  const [automationOpen, setAutomationOpen] = useState(false);
+  const [metrics, setMetrics] = useState<string[]>([]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('symptomed_metrics');
+    if (stored) {
+      try {
+        setMetrics(JSON.parse(stored));
+      } catch {}
+    }
+  }, []);
 
   const handleCopy = () => {
     if (!userId) return;
@@ -36,6 +37,15 @@ export const PulseSetupPage: FC = () => {
       setTimeout(() => setCopied(false), 3000);
     });
   };
+
+  const handleTest = () => {
+    if (!userId) return;
+    window.open(`shortcuts://run-shortcut?name=СимптоМед%20—%20Здоровье&input=${userId}`);
+  };
+
+  const metricsLabel = metrics.length > 0
+    ? 'Будем отслеживать: ' + metrics.map((m) => METRIC_LABELS[m] ?? m).join(', ')
+    : 'Подключите устройства для отслеживания показателей здоровья';
 
   const blockStyle: React.CSSProperties = {
     background: 'var(--tg-theme-secondary-bg-color, #f4f4f5)',
@@ -62,20 +72,19 @@ export const PulseSetupPage: FC = () => {
         boxSizing: 'border-box',
         gap: 16,
       }}>
-
         {/* Header */}
         <div>
           <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--tg-theme-text-color, #000)', marginBottom: 6 }}>
-            ⚙️ Настройка за 2 шага
+            ⚙️ Подключите ваши устройства
           </div>
           <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)', lineHeight: 1.5 }}>
-            После настройки пульс, давление, SpO2 и шаги будут отправляться автоматически
+            {metricsLabel}
           </div>
         </div>
 
         {/* Step 1 */}
         <div style={blockStyle}>
-          <div style={stepTitleStyle}>📋 Шаг 1: Скопируйте ваш ID</div>
+          <div style={stepTitleStyle}>1. Скопируйте ваш код</div>
           {userId ? (
             <>
               <div style={{
@@ -93,129 +102,66 @@ export const PulseSetupPage: FC = () => {
                 {userId}
               </div>
               <Button size="l" stretched onClick={handleCopy}>
-                {copied ? '✅ Скопировано! Откройте Shortcuts' : 'Скопировать ID'}
+                {copied ? '✅ Скопировано' : 'Скопировать'}
               </Button>
+              <div style={{ fontSize: 13, color: 'var(--tg-theme-hint-color, #999)', textAlign: 'center' }}>
+                Этот код нужен чтобы данные приходили именно вам
+              </div>
             </>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)', textAlign: 'center', lineHeight: 1.6 }}>
-                Не удалось определить ID автоматически. Откройте бота и отправьте команду <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>/start</span> — бот ответит вашим ID.
-              </div>
-              <Button
-                size="l"
-                stretched
-                onClick={() => window.open('https://t.me/medgg_bot', '_blank')}
-              >
-                Открыть бота
-              </Button>
+            <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)', textAlign: 'center', lineHeight: 1.6 }}>
+              Не удалось определить ID. Откройте бота и отправьте команду{' '}
+              <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>/start</span> — бот ответит вашим ID.
             </div>
           )}
         </div>
 
         {/* Step 2 */}
         <div style={blockStyle}>
-          <div style={stepTitleStyle}>📥 Шаг 2: Установите Shortcut</div>
-          <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)', lineHeight: 1.5 }}>
-            При установке iOS попросит ввести ваш Telegram ID — вставьте скопированный ID из шага 1.
-          </div>
-          <Button
-            size="l"
-            stretched
-            onClick={() => window.open('https://www.icloud.com/shortcuts/5803e08e3cf147908cae4e582fc45194')}
-          >
+          <div style={stepTitleStyle}>2. Установите Shortcut</div>
+          <Button size="l" stretched onClick={() => window.open(SHORTCUT_URL)}>
             Установить Shortcut
           </Button>
-          <div style={{ fontSize: 13, color: 'var(--tg-theme-hint-color, #999)', textAlign: 'center' }}>
-            Нажмите "Добавить команду" и вставьте ID когда появится запрос
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)', marginBottom: 2 }}>После нажатия:</div>
+            {[
+              '➊ Нажмите «Добавить команду»',
+              '➋ Вставьте ваш код когда появится поле',
+              '➌ Нажмите «Добавить» ещё раз',
+            ].map((step, i) => (
+              <div key={i} style={{ fontSize: 14, color: 'var(--tg-theme-text-color, #000)', lineHeight: 1.5 }}>
+                {step}
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Divider */}
-        <div style={{ height: 1, background: 'var(--tg-theme-secondary-bg-color, #f0f0f0)' }} />
-
-        {/* Optional: Automation */}
+        {/* Step 3 */}
         <div style={blockStyle}>
-          <div style={stepTitleStyle}>🔄 Опционально: Автоматическая отправка</div>
+          <div style={stepTitleStyle}>3. Готово!</div>
           <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)', lineHeight: 1.5 }}>
-            Хотите чтобы данные отправлялись сами каждый день?
+            Нажмите «Отправить показатели» — данные придут в бот автоматически
           </div>
-          <Button
-            size="m"
-            stretched
-            mode="outline"
-            onClick={() => setAutomationOpen((v) => !v)}
-          >
-            {automationOpen ? 'Скрыть инструкцию' : 'Показать инструкцию'}
+          <Button size="l" stretched disabled={!userId} onClick={handleTest}>
+            Проверить — отправить сейчас
           </Button>
+        </div>
 
-          {automationOpen && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
-              {AUTOMATION_STEPS.map((step, i) => (
-                <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                  <div style={{
-                    minWidth: 24, height: 24, borderRadius: 12,
-                    background: 'var(--tg-theme-button-color, #2481cc)',
-                    color: 'var(--tg-theme-button-text-color, #fff)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 12, fontWeight: 700, flexShrink: 0,
-                  }}>
-                    {i + 1}
-                  </div>
-                  <div style={{ fontSize: 14, color: 'var(--tg-theme-text-color, #000)', lineHeight: 1.5, paddingTop: 3 }}>
-                    {step}
-                  </div>
-                </div>
-              ))}
-              <div style={{
-                marginTop: 8,
-                fontSize: 14,
-                color: 'var(--tg-theme-hint-color, #999)',
-                lineHeight: 1.5,
-                textAlign: 'center',
-              }}>
-                Теперь каждый раз когда вы открываете Telegram, ваши показатели здоровья будут автоматически отправляться в фоне.
-              </div>
-            </div>
-          )}
-
-          {/* Info block */}
-          <div style={{
-            background: 'var(--tg-theme-bg-color, #fff)',
-            border: '1px solid var(--tg-theme-secondary-bg-color, #e0e0e0)',
-            borderRadius: 12,
-            padding: '14px 14px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 8,
-          }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--tg-theme-text-color, #000)' }}>
-              ℹ️ Почему именно Telegram?
-            </div>
-            <div style={{ fontSize: 13, color: 'var(--tg-theme-hint-color, #888)', lineHeight: 1.6 }}>
-              Автоматизация срабатывает при открытии Telegram — это значит что показатели отправляются каждый раз когда вы заходите в мессенджер. Это удобно потому что:
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              {[
-                'Вы открываете Telegram несколько раз в день — данные будут актуальными',
-                'Не нужно помнить про отдельное время отправки',
-                'Показатели отправляются незаметно в фоне',
-              ].map((item, i) => (
-                <div key={i} style={{ fontSize: 13, color: 'var(--tg-theme-hint-color, #888)', lineHeight: 1.5, paddingLeft: 4 }}>
-                  — {item}
-                </div>
-              ))}
-            </div>
-            <div style={{
+        {/* Change metrics */}
+        <div style={{ textAlign: 'center' }}>
+          <button
+            onClick={() => navigate('/metrics-setup')}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--tg-theme-hint-color, #999)',
               fontSize: 13,
-              color: 'var(--tg-theme-hint-color, #888)',
-              lineHeight: 1.6,
-              borderTop: '1px solid var(--tg-theme-secondary-bg-color, #e0e0e0)',
-              paddingTop: 8,
-              marginTop: 4,
-            }}>
-              ⚠️ Важно: автоматизация работает только при разблокированном экране. Если iPhone заблокирован — отправка не произойдёт. Но как только вы разблокируете телефон и откроете Telegram — показатели отправятся автоматически.
-            </div>
-          </div>
+              cursor: 'pointer',
+              textDecoration: 'underline',
+            }}
+          >
+            Изменить набор показателей
+          </button>
         </div>
 
         <Button size="l" stretched mode="outline" onClick={() => navigate('/health')}>

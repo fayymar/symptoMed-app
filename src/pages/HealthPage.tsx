@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@telegram-apps/telegram-ui';
 
@@ -8,19 +8,35 @@ import { useUserId } from '../hooks/useUserId';
 
 type SendStatus = 'idle' | 'waiting' | 'success' | 'error';
 
+function getStoredMetrics(): string[] | null {
+  const stored = localStorage.getItem('symptomed_metrics');
+  if (stored === null) return null;
+  try {
+    return JSON.parse(stored);
+  } catch {
+    return [];
+  }
+}
+
 export const HealthPage: FC = () => {
   const navigate = useNavigate();
   const platform = (window as any).Telegram?.WebApp?.platform;
   const isIOS = platform === 'ios';
   const [sendStatus, setSendStatus] = useState<SendStatus>('idle');
   const userId = useUserId();
+  const [metrics] = useState<string[] | null>(getStoredMetrics);
+
+  useEffect(() => {
+    if (metrics === null) {
+      navigate('/metrics-setup', { replace: true });
+    }
+  }, [metrics, navigate]);
 
   const handleSendMetrics = () => {
     if (!userId) {
       alert('Откройте приложение через бота');
       return;
     }
-
     window.open(`shortcuts://run-shortcut?name=СимптоМед%20-%20Здоровье&input=${userId}`);
     setSendStatus('waiting');
 
@@ -36,6 +52,10 @@ export const HealthPage: FC = () => {
         .catch(() => setSendStatus('error'));
     }, 10000);
   };
+
+  if (metrics === null) return null;
+
+  const activeMetrics = metrics.length > 0 ? metrics : ['heartrate', 'blood_pressure', 'spo2', 'steps'];
 
   return (
     <Page back={false}>
@@ -127,22 +147,33 @@ export const HealthPage: FC = () => {
                 📊 История
               </div>
 
-              <Button size="l" stretched mode="outline" onClick={() => navigate('/metrics/heartrate')}>
-                ❤️ Пульс
-              </Button>
-              <Button size="l" stretched mode="outline" onClick={() => navigate('/metrics/blood-pressure')}>
-                🩺 Давление
-              </Button>
-              <Button size="l" stretched mode="outline" onClick={() => navigate('/metrics/spo2')}>
-                🫁 Сатурация (SpO2)
-              </Button>
-              <Button size="l" stretched mode="outline" onClick={() => navigate('/metrics/steps')}>
-                👣 Шаги
+              {activeMetrics.includes('heartrate') && (
+                <Button size="l" stretched mode="outline" onClick={() => navigate('/metrics/heartrate')}>
+                  ❤️ Пульс
+                </Button>
+              )}
+              {activeMetrics.includes('blood_pressure') && (
+                <Button size="l" stretched mode="outline" onClick={() => navigate('/metrics/blood-pressure')}>
+                  🩺 Давление
+                </Button>
+              )}
+              {activeMetrics.includes('spo2') && (
+                <Button size="l" stretched mode="outline" onClick={() => navigate('/metrics/spo2')}>
+                  🫁 Сатурация (SpO2)
+                </Button>
+              )}
+              {activeMetrics.includes('steps') && (
+                <Button size="l" stretched mode="outline" onClick={() => navigate('/metrics/steps')}>
+                  👣 Шаги
+                </Button>
+              )}
+
+              <Button size="l" stretched mode="outline" onClick={() => navigate('/pulse-setup')} style={{ marginTop: 8 }}>
+                ⚙️ Настройка Shortcut
               </Button>
 
-              <Button size="l" stretched mode="outline" onClick={() => navigate('/pulse-setup')}
-                style={{ marginTop: 8 }}>
-                ⚙️ Настройка Shortcut
+              <Button size="l" stretched mode="outline" onClick={() => navigate('/metrics-setup')}>
+                ⚙️ Изменить устройства
               </Button>
             </div>
           )}
