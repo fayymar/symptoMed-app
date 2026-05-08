@@ -1,4 +1,5 @@
 import { useState, useEffect, type FC } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Input } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
@@ -14,6 +15,7 @@ function toDateInputValue(raw: string | null | undefined): string {
 
 export const ProfilePage: FC = () => {
   useTelegramBackButton();
+  const navigate = useNavigate();
   const userId = useUserId();
 
   const [loading, setLoading] = useState(false);
@@ -21,6 +23,7 @@ export const ProfilePage: FC = () => {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
   const [profileExists, setProfileExists] = useState(false);
+  const [medHistoryFilled, setMedHistoryFilled] = useState(false);
 
   const [fullName, setFullName] = useState('');
   const [birthdate, setBirthdate] = useState('');
@@ -44,6 +47,7 @@ export const ProfilePage: FC = () => {
           setGender(p.gender || '');
           setHeight(p.height ? String(p.height) : '');
           setWeight(p.weight ? String(p.weight) : '');
+          setMedHistoryFilled(!!(p.chronic_diseases?.length || p.hereditary?.length));
           setProfileExists(true);
         }
       })
@@ -247,6 +251,15 @@ export const ProfilePage: FC = () => {
             {error}
           </div>
         )}
+
+        <div>
+          <Button size="l" stretched mode="outline" onClick={() => navigate('/medical-history')}>
+            📋 Медицинская история
+          </Button>
+          <div style={{ fontSize: 12, color: medHistoryFilled ? '#34C759' : 'var(--tg-theme-hint-color, #999)', textAlign: 'center', marginTop: 6 }}>
+            {medHistoryFilled ? '✅ Заполнено' : 'Не заполнено · Влияет на точность диагностики'}
+          </div>
+        </div>
 
         <Button size="l" stretched disabled={saving} onClick={handleSave}>
           {saved ? '✅ Сохранено' : saving ? 'Сохранение...' : '💾 Сохранить'}
