@@ -1,6 +1,5 @@
 import { useState, useEffect, type FC } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Section, Cell, List, Button } from '@telegram-apps/telegram-ui';
+import { Section, Cell, List } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
 import { useUserId } from '../hooks/useUserId';
@@ -62,7 +61,6 @@ function mergeRecords(systolicRecords: BPRecord[], diastolicRecords: BPRecord[])
 
 export const BloodPressurePage: FC = () => {
   useTelegramBackButton();
-  const navigate = useNavigate();
   const userId = useUserId();
 
   const [measurements, setMeasurements] = useState<BPMeasurement[]>([]);

@@ -1,6 +1,6 @@
 import { useState, useEffect, type FC } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Section, Cell, List, Button } from '@telegram-apps/telegram-ui';
+import { useParams } from 'react-router-dom';
+import { Section, Cell, List } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
 import { useUserId } from '../hooks/useUserId';
@@ -90,7 +90,6 @@ function formatDate(utcString: string): string {
 export const MetricHistoryPage: FC = () => {
   useTelegramBackButton();
   const { type } = useParams<{ type: string }>();
-  const navigate = useNavigate();
   const config = type ? METRICS_CONFIG[type] : undefined;
 
   const userId = useUserId();
