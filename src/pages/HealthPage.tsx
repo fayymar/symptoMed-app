@@ -1,13 +1,42 @@
 import type { FC } from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
 import { useUserId } from '../hooks/useUserId';
 import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 
 type SendStatus = 'idle' | 'waiting' | 'success' | 'error';
+
+// Design tokens
+const accent = '#f5b942';
+const accentInk = '#1c1000';
+const accentSoft = 'rgba(245, 185, 66, 0.14)';
+const okColor = '#34d399';
+const okSoft = 'rgba(52, 211, 153, 0.14)';
+const infoColor = '#60a5fa';
+const infoSoft = 'rgba(96, 165, 250, 0.14)';
+const dangerColor = '#f87171';
+const dangerSoft = 'rgba(248, 113, 113, 0.14)';
+const warnColor = '#fbbf24';
+const warnSoft = 'rgba(251, 191, 36, 0.14)';
+
+interface MetricCard {
+  id: string;
+  icon: string;
+  label: string;
+  unit: string;
+  plateBg: string;
+  plateColor: string;
+  path: string;
+}
+
+const METRIC_CARDS: MetricCard[] = [
+  { id: 'heartrate', icon: '❤️', label: 'Пульс', unit: 'уд/мин', plateBg: dangerSoft, plateColor: dangerColor, path: '/metrics/heartrate' },
+  { id: 'blood_pressure', icon: '🩺', label: 'Давление', unit: 'мм рт.ст.', plateBg: infoSoft, plateColor: infoColor, path: '/metrics/blood-pressure' },
+  { id: 'spo2', icon: '🫁', label: 'SpO2', unit: '%', plateBg: okSoft, plateColor: okColor, path: '/metrics/spo2' },
+  { id: 'steps', icon: '👣', label: 'Шаги', unit: 'шагов', plateBg: accentSoft, plateColor: accent, path: '/metrics/steps' },
+];
 
 export const HealthPage: FC = () => {
   useTelegramBackButton();
@@ -42,125 +71,273 @@ export const HealthPage: FC = () => {
     }, 10000);
   };
 
+  const activeMetrics = METRIC_CARDS.filter((m) => metrics.includes(m.id));
+
   return (
     <Page back={false}>
       <div style={{
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100vh',
-        padding: '24px 16px 32px',
-        boxSizing: 'border-box',
+        background: 'var(--tg-theme-bg-color)',
+        fontFamily: "'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif",
+        WebkitFontSmoothing: 'antialiased',
       }}>
-        <div style={{ flex: 1 }}>
-          <div style={{
-            fontSize: 24,
-            fontWeight: 700,
-            color: 'var(--tg-theme-text-color, #000)',
-            marginBottom: 8,
-          }}>
-            📊 Показатели здоровья
+        {/* Top bar */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          padding: '12px 16px 8px',
+          gap: 12,
+        }}>
+          <div style={{ flex: 1 }}>
+            <div style={{
+              fontSize: 22,
+              fontWeight: 700,
+              letterSpacing: '-0.01em',
+              color: 'var(--tg-theme-text-color)',
+            }}>
+              📊 Показатели здоровья
+            </div>
+            <div style={{
+              fontSize: 13,
+              color: 'var(--tg-theme-hint-color)',
+              marginTop: 2,
+              letterSpacing: '-0.003em',
+            }}>
+              Apple Watch и совместимые устройства
+            </div>
           </div>
-          <div style={{
-            fontSize: 15,
-            color: 'var(--tg-theme-hint-color, #999)',
-            marginBottom: 24,
-            lineHeight: 1.5,
-          }}>
-            Все показатели с Apple Watch и совместимых устройств
-          </div>
+        </div>
+
+        <div style={{ flex: 1, padding: '8px 16px 32px', display: 'flex', flexDirection: 'column', gap: 12 }}>
 
           {!isIOS ? (
+            /* Non-iOS warning */
             <div style={{
-              background: 'var(--tg-theme-secondary-bg-color, #f4f4f5)',
-              borderRadius: 12,
-              padding: '20px 16px',
+              background: 'var(--tg-theme-secondary-bg-color)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              borderRadius: 16,
+              padding: '20px 18px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 10,
+              alignItems: 'center',
               textAlign: 'center',
             }}>
-              <div style={{ fontSize: 32, marginBottom: 12 }}>⚠️</div>
+              <div style={{
+                width: 56,
+                height: 56,
+                borderRadius: 16,
+                background: warnSoft,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 26,
+              }}>
+                ⚠️
+              </div>
               <div style={{
                 fontSize: 16,
                 fontWeight: 600,
-                color: 'var(--tg-theme-text-color, #000)',
-                marginBottom: 8,
+                color: 'var(--tg-theme-text-color)',
+                letterSpacing: '-0.01em',
               }}>
-                Функция доступна только на iPhone
+                Только для iPhone
               </div>
               <div style={{
-                fontSize: 14,
-                color: 'var(--tg-theme-hint-color, #999)',
+                fontSize: 13,
+                color: 'var(--tg-theme-hint-color)',
                 lineHeight: 1.5,
+                maxWidth: 260,
               }}>
-                Для работы с Apple Watch и автоматической отправки показателей нужен iPhone с приложением Здоровье.
+                Для работы с Apple Watch нужен iPhone с приложением «Здоровье».
               </div>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <Button
-                size="l"
-                stretched
+            <>
+              {/* Send metrics button */}
+              <button
                 disabled={sendStatus === 'waiting'}
                 onClick={handleSendMetrics}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  width: '100%',
+                  height: 56,
+                  borderRadius: 16,
+                  background: sendStatus === 'success' ? okSoft : accent,
+                  color: sendStatus === 'success' ? okColor : accentInk,
+                  fontSize: 15,
+                  fontWeight: 600,
+                  letterSpacing: '-0.01em',
+                  border: 'none',
+                  cursor: sendStatus === 'waiting' ? 'not-allowed' : 'pointer',
+                  opacity: sendStatus === 'waiting' ? 0.6 : 1,
+                  fontFamily: 'inherit',
+                  boxShadow: sendStatus === 'success' ? 'none' : `0 4px 20px rgba(245, 185, 66, 0.25)`,
+                  transition: 'background 0.2s, color 0.2s, transform 0.1s',
+                }}
               >
-                📤 Отправить показатели сейчас
-              </Button>
+                {sendStatus === 'idle' && '📤 Отправить показатели сейчас'}
+                {sendStatus === 'waiting' && '⏳ Отправка...'}
+                {sendStatus === 'success' && '✅ Отчёт отправлен'}
+                {sendStatus === 'error' && '⚠️ Попробуйте ещё раз'}
+              </button>
 
-              {sendStatus === 'waiting' && (
-                <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)', textAlign: 'center' }}>
-                  ⏳ Отправка...
-                </div>
-              )}
-              {sendStatus === 'success' && (
-                <div style={{ fontSize: 14, color: '#34C759', textAlign: 'center', fontWeight: 500 }}>
-                  ✅ Отчёт отправлен в чат
-                </div>
-              )}
-              {sendStatus === 'error' && (
-                <div style={{ fontSize: 14, color: '#ec3942', textAlign: 'center' }}>
-                  Попробуйте ещё раз
-                </div>
-              )}
-
+              {/* Section label */}
               <div style={{
-                fontSize: 13,
+                fontSize: 11,
                 fontWeight: 600,
-                color: 'var(--tg-theme-hint-color, #999)',
+                letterSpacing: '0.08em',
                 textTransform: 'uppercase',
-                letterSpacing: 0.5,
-                marginTop: 8,
+                color: 'var(--tg-theme-hint-color)',
                 paddingLeft: 4,
+                marginTop: 4,
               }}>
-                📊 История
+                История
               </div>
 
-              {metrics.includes('heartrate') && (
-                <Button size="l" stretched mode="outline" onClick={() => navigate('/metrics/heartrate')}>
-                  ❤️ Пульс
-                </Button>
-              )}
-              {metrics.includes('blood_pressure') && (
-                <Button size="l" stretched mode="outline" onClick={() => navigate('/metrics/blood-pressure')}>
-                  🩺 Давление
-                </Button>
-              )}
-              {metrics.includes('spo2') && (
-                <Button size="l" stretched mode="outline" onClick={() => navigate('/metrics/spo2')}>
-                  🫁 Сатурация (SpO2)
-                </Button>
-              )}
-              {metrics.includes('steps') && (
-                <Button size="l" stretched mode="outline" onClick={() => navigate('/metrics/steps')}>
-                  👣 Шаги
-                </Button>
-              )}
+              {/* Metric cards grid */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 10,
+              }}>
+                {activeMetrics.map((m) => (
+                  <button
+                    key={m.id}
+                    onClick={() => navigate(m.path)}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 10,
+                      padding: '14px 14px 14px',
+                      borderRadius: 16,
+                      background: 'var(--tg-theme-secondary-bg-color)',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      fontFamily: 'inherit',
+                      transition: 'opacity 0.15s',
+                    }}
+                    onMouseDown={(e) => (e.currentTarget.style.opacity = '0.7')}
+                    onMouseUp={(e) => (e.currentTarget.style.opacity = '1')}
+                    onTouchStart={(e) => (e.currentTarget.style.opacity = '0.7')}
+                    onTouchEnd={(e) => (e.currentTarget.style.opacity = '1')}
+                  >
+                    <div style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 12,
+                      background: m.plateBg,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 20,
+                    }}>
+                      {m.icon}
+                    </div>
+                    <div>
+                      <div style={{
+                        fontSize: 14,
+                        fontWeight: 600,
+                        color: 'var(--tg-theme-text-color)',
+                        letterSpacing: '-0.005em',
+                      }}>
+                        {m.label}
+                      </div>
+                      <div style={{
+                        fontSize: 11,
+                        color: 'var(--tg-theme-hint-color)',
+                        marginTop: 2,
+                      }}>
+                        {m.unit}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
 
-              <Button size="l" stretched mode="outline" onClick={() => navigate('/pulse-setup')} style={{ marginTop: 8 }}>
-                ⚙️ Настройка Shortcut
-              </Button>
+              {/* Setup buttons */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
+                <button
+                  onClick={() => navigate('/pulse-setup')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 14,
+                    width: '100%',
+                    padding: '12px 14px',
+                    borderRadius: 16,
+                    background: 'var(--tg-theme-secondary-bg-color)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  <div style={{
+                    width: 40, height: 40, borderRadius: 12,
+                    background: 'rgba(255,255,255,0.06)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
+                    flexShrink: 0,
+                  }}>
+                    ⚙️
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--tg-theme-text-color)', letterSpacing: '-0.005em' }}>
+                      Настройка Shortcut
+                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--tg-theme-hint-color)', marginTop: 2 }}>
+                      Подключение и конфигурация
+                    </div>
+                  </div>
+                  <svg width="7" height="12" viewBox="0 0 7 12" fill="none" style={{ flexShrink: 0, opacity: 0.3 }}>
+                    <path d="M1 1L6 6L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
 
-              <Button size="l" stretched mode="outline" onClick={() => navigate('/metrics-setup')}>
-                ⚙️ Изменить устройства
-              </Button>
-            </div>
+                <button
+                  onClick={() => navigate('/metrics-setup')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 14,
+                    width: '100%',
+                    padding: '12px 14px',
+                    borderRadius: 16,
+                    background: 'var(--tg-theme-secondary-bg-color)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  <div style={{
+                    width: 40, height: 40, borderRadius: 12,
+                    background: 'rgba(255,255,255,0.06)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
+                    flexShrink: 0,
+                  }}>
+                    📱
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--tg-theme-text-color)', letterSpacing: '-0.005em' }}>
+                      Изменить устройства
+                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--tg-theme-hint-color)', marginTop: 2 }}>
+                      Управление источниками данных
+                    </div>
+                  </div>
+                  <svg width="7" height="12" viewBox="0 0 7 12" fill="none" style={{ flexShrink: 0, opacity: 0.3 }}>
+                    <path d="M1 1L6 6L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            </>
           )}
         </div>
       </div>
