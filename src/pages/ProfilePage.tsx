@@ -1,72 +1,53 @@
 import { useState, useEffect, type FC } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button, Input } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
 import { useUserId } from '../hooks/useUserId';
+import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 
 const BASE_URL = 'https://telegram-doctor-bot.onrender.com/api/profile';
 
-interface ProfileData {
-  full_name: string;
-  birthdate: string;
-  gender: 'male' | 'female' | '';
-  height: string;
-  weight: string;
-  phone: string;
-}
-
 function toDateInputValue(raw: string | null | undefined): string {
   if (!raw) return '';
-  // Take just the YYYY-MM-DD part (handles both "1990-01-15" and "1990-01-15T00:00:00")
   return raw.slice(0, 10);
 }
 
 export const ProfilePage: FC = () => {
-  const navigate = useNavigate();
+  useTelegramBackButton();
   const userId = useUserId();
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
   const [profileExists, setProfileExists] = useState(false);
 
-  const [profile, setProfile] = useState<ProfileData>({
-    full_name: '',
-    birthdate: '',
-    gender: '',
-    height: '',
-    weight: '',
-    phone: '',
-  });
+  const [fullName, setFullName] = useState('');
+  const [birthdate, setBirthdate] = useState('');
+  const [gender, setGender] = useState('');
+  const [height, setHeight] = useState('');
+  const [weight, setWeight] = useState('');
+  const [phone, setPhone] = useState('');
 
   useEffect(() => {
-    if (!userId) {
-      setLoading(false);
-      return;
-    }
+    if (!userId) return;
+    setLoading(true);
     fetch(`${BASE_URL}/${userId}`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
+      .then((r) => r.json())
       .then((data) => {
-        console.log(data);
-        if (data.exists === true) {
-          setProfileExists(true);
+        console.log('Profile data:', data);
+        if (data.exists && data.profile) {
           const p = data.profile;
-          setProfile({
-            full_name: p.full_name ?? '',
-            birthdate: toDateInputValue(p.birthdate),
-            gender: p.gender ?? '',
-            height: p.height != null ? String(p.height) : '',
-            weight: p.weight != null ? String(p.weight) : '',
-            phone: p.phone ?? '',
-          });
+          setFullName(p.full_name || '');
+          setPhone(p.phone || '');
+          setBirthdate(toDateInputValue(p.birthdate));
+          setGender(p.gender || '');
+          setHeight(p.height ? String(p.height) : '');
+          setWeight(p.weight ? String(p.weight) : '');
+          setProfileExists(true);
         }
       })
-      .catch(() => {})
+      .catch((e) => console.error('Profile fetch error:', e))
       .finally(() => setLoading(false));
   }, [userId]);
 
@@ -78,12 +59,12 @@ export const ProfilePage: FC = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          full_name: profile.full_name || null,
-          birthdate: profile.birthdate || null,
-          gender: profile.gender || null,
-          height: profile.height ? Number(profile.height) : null,
-          weight: profile.weight ? Number(profile.weight) : null,
-          phone: profile.phone || null,
+          full_name: fullName || null,
+          birthdate: birthdate || null,
+          gender: gender || null,
+          height: height ? Number(height) : null,
+          weight: weight ? Number(weight) : null,
+          phone: phone || null,
         }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -144,7 +125,6 @@ export const ProfilePage: FC = () => {
         boxSizing: 'border-box',
         gap: 20,
       }}>
-        {/* Header */}
         <div>
           <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--tg-theme-text-color, #000)', marginBottom: 6 }}>
             👤 Профиль
@@ -154,7 +134,6 @@ export const ProfilePage: FC = () => {
           </div>
         </div>
 
-        {/* Info block — only when profile is filled */}
         {profileExists && (
           <div style={{
             background: 'var(--tg-theme-secondary-bg-color, #f4f4f5)',
@@ -168,65 +147,61 @@ export const ProfilePage: FC = () => {
           </div>
         )}
 
-        {/* Name */}
         <div style={fieldBlock}>
           <div style={labelStyle}>Имя</div>
           <Input
             type="text"
             placeholder="Ваше имя"
-            value={profile.full_name}
-            onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
           />
         </div>
 
-        {/* Birth date */}
         <div style={fieldBlock}>
           <div style={labelStyle}>Дата рождения</div>
           <Input
             type="date"
-            value={profile.birthdate}
-            onChange={(e) => setProfile({ ...profile, birthdate: e.target.value })}
+            value={birthdate}
+            onChange={(e) => setBirthdate(e.target.value)}
           />
         </div>
 
-        {/* Gender */}
         <div style={fieldBlock}>
           <div style={labelStyle}>Пол</div>
           <div style={{ display: 'flex', gap: 10 }}>
             <button
               style={{
                 ...toggleBtnBase,
-                background: profile.gender === 'male' ? 'var(--tg-theme-button-color, #2481cc)' : 'transparent',
-                color: profile.gender === 'male' ? 'var(--tg-theme-button-text-color, #fff)' : 'var(--tg-theme-button-color, #2481cc)',
+                background: gender === 'male' ? 'var(--tg-theme-button-color, #2481cc)' : 'transparent',
+                color: gender === 'male' ? 'var(--tg-theme-button-text-color, #fff)' : 'var(--tg-theme-button-color, #2481cc)',
               }}
-              onClick={() => setProfile({ ...profile, gender: 'male' })}
+              onClick={() => setGender('male')}
             >
               Мужской
             </button>
             <button
               style={{
                 ...toggleBtnBase,
-                background: profile.gender === 'female' ? 'var(--tg-theme-button-color, #2481cc)' : 'transparent',
-                color: profile.gender === 'female' ? 'var(--tg-theme-button-text-color, #fff)' : 'var(--tg-theme-button-color, #2481cc)',
+                background: gender === 'female' ? 'var(--tg-theme-button-color, #2481cc)' : 'transparent',
+                color: gender === 'female' ? 'var(--tg-theme-button-text-color, #fff)' : 'var(--tg-theme-button-color, #2481cc)',
               }}
-              onClick={() => setProfile({ ...profile, gender: 'female' })}
+              onClick={() => setGender('female')}
             >
               Женский
             </button>
           </div>
         </div>
 
-        {/* Height */}
         <div style={fieldBlock}>
           <div style={labelStyle}>Рост</div>
           <div style={{ position: 'relative' }}>
             <Input
               type="number"
               placeholder="см"
-              value={profile.height}
-              onChange={(e) => setProfile({ ...profile, height: e.target.value })}
+              value={height}
+              onChange={(e) => setHeight(e.target.value)}
             />
-            {profile.height && (
+            {height && (
               <span style={{
                 position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)',
                 fontSize: 14, color: 'var(--tg-theme-hint-color, #999)', pointerEvents: 'none',
@@ -237,17 +212,16 @@ export const ProfilePage: FC = () => {
           </div>
         </div>
 
-        {/* Weight */}
         <div style={fieldBlock}>
           <div style={labelStyle}>Вес</div>
           <div style={{ position: 'relative' }}>
             <Input
               type="number"
               placeholder="кг"
-              value={profile.weight}
-              onChange={(e) => setProfile({ ...profile, weight: e.target.value })}
+              value={weight}
+              onChange={(e) => setWeight(e.target.value)}
             />
-            {profile.weight && (
+            {weight && (
               <span style={{
                 position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)',
                 fontSize: 14, color: 'var(--tg-theme-hint-color, #999)', pointerEvents: 'none',
@@ -258,41 +232,24 @@ export const ProfilePage: FC = () => {
           </div>
         </div>
 
-        {/* Phone */}
         <div style={fieldBlock}>
           <div style={labelStyle}>Телефон</div>
           <Input
             type="tel"
             placeholder="+998..."
-            value={profile.phone}
-            onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
           />
         </div>
 
-        {/* Error */}
         {error && (
           <div style={{ fontSize: 14, color: '#ec3942', textAlign: 'center' }}>
             {error}
           </div>
         )}
 
-        {/* Save button */}
-        <Button
-          size="l"
-          stretched
-          disabled={saving}
-          onClick={handleSave}
-        >
+        <Button size="l" stretched disabled={saving} onClick={handleSave}>
           {saved ? '✅ Сохранено' : saving ? 'Сохранение...' : '💾 Сохранить'}
-        </Button>
-
-        <Button
-          size="l"
-          stretched
-          mode="outline"
-          onClick={() => navigate('/')}
-        >
-          Назад
         </Button>
       </div>
     </Page>

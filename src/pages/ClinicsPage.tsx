@@ -1,8 +1,8 @@
-import { useState, type FC } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, type FC } from 'react';
 import { Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
+import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 
 interface Clinic {
   name: string;
@@ -49,10 +49,31 @@ const SPECIALIZATIONS = ['Все', 'Терапевт', 'Кардиолог', 'Н
 type Tab = 'clinics' | 'specialists';
 
 export const ClinicsPage: FC = () => {
-  const navigate = useNavigate();
+  useTelegramBackButton();
   const [tab, setTab] = useState<Tab>('clinics');
   const [selectedSpec, setSelectedSpec] = useState('Все');
   const [search, setSearch] = useState('');
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locationDenied, setLocationDenied] = useState(false);
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => setLocationDenied(true),
+      );
+    }
+  }, []);
+
+  const requestLocation = () => {
+    if (navigator.geolocation) {
+      setLocationDenied(false);
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => setLocationDenied(true),
+      );
+    }
+  };
 
   const filtered = CLINICS.filter((c) => {
     const matchSpec =
@@ -91,12 +112,45 @@ export const ClinicsPage: FC = () => {
       }}>
         <div>
           <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--tg-theme-text-color, #000)', marginBottom: 4 }}>
-            🏥 Найти клиники
+            🏥 Клиники и специалисты
           </div>
           <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)' }}>
             Медицинские учреждения рядом с вами
           </div>
         </div>
+
+        {/* Geolocation banner */}
+        {locationDenied && (
+          <div style={{
+            background: 'var(--tg-theme-secondary-bg-color, #f4f4f5)',
+            borderRadius: 12,
+            padding: '12px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+          }}>
+            <div style={{ fontSize: 13, color: 'var(--tg-theme-hint-color, #888)', flex: 1 }}>
+              📍 Разрешите доступ к геолокации чтобы найти ближайшие клиники
+            </div>
+            <button
+              onClick={requestLocation}
+              style={{
+                padding: '6px 12px',
+                borderRadius: 8,
+                border: 'none',
+                background: 'var(--tg-theme-button-color, #2481cc)',
+                color: 'var(--tg-theme-button-text-color, #fff)',
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+                flexShrink: 0,
+              }}
+            >
+              Разрешить
+            </button>
+          </div>
+        )}
 
         {/* Tabs */}
         <div style={{
@@ -129,6 +183,18 @@ export const ClinicsPage: FC = () => {
 
         {tab === 'clinics' && (
           <>
+            {/* Geolocation sort button */}
+            {userLocation && (
+              <Button
+                size="m"
+                stretched
+                mode="outline"
+                onClick={() => alert('Сортировка по расстоянию: функция в разработке')}
+              >
+                📍 Рядом со мной
+              </Button>
+            )}
+
             {/* Specialization filter */}
             <div style={{ overflowX: 'auto', display: 'flex', gap: 8, paddingBottom: 4 }}>
               {SPECIALIZATIONS.map((spec) => (
@@ -231,10 +297,6 @@ export const ClinicsPage: FC = () => {
             <div style={{ fontSize: 13 }}>Скоро здесь появится список специалистов</div>
           </div>
         )}
-
-        <Button size="l" stretched mode="outline" onClick={() => navigate('/')}>
-          На главную
-        </Button>
       </div>
     </Page>
   );

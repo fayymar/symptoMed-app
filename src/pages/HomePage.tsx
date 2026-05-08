@@ -4,6 +4,15 @@ import { Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
 
+const btnStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '16px',
+  fontSize: '16px',
+  borderRadius: '12px',
+  marginBottom: '10px',
+  textAlign: 'center',
+};
+
 export const HomePage: FC = () => {
   const navigate = useNavigate();
 
@@ -43,24 +52,24 @@ export const HomePage: FC = () => {
           </div>
         </div>
 
-        <div style={{ paddingBottom: 32, display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <Button size="l" stretched onClick={() => navigate('/symptoms')}>
+        <div style={{ paddingBottom: 32 }}>
+          <Button size="l" stretched style={btnStyle} onClick={() => navigate('/symptoms')}>
             Начать консультацию
           </Button>
-          <Button size="l" stretched mode="outline" onClick={() => navigate('/history')}>
+          <Button size="l" stretched mode="outline" style={btnStyle} onClick={() => navigate('/history')}>
             История консультаций
           </Button>
-          <Button size="l" stretched mode="outline" onClick={() => navigate('/health')}>
-            🩺 Здоровье с Apple Watch
+          <Button size="l" stretched mode="outline" style={btnStyle} onClick={() => navigate('/health')}>
+            📊 Показатели здоровья
           </Button>
-          <Button size="l" stretched mode="outline" onClick={() => navigate('/profile')}>
+          <Button size="l" stretched mode="outline" style={btnStyle} onClick={() => navigate('/profile')}>
             👤 Профиль
           </Button>
-          <Button size="l" stretched mode="outline" onClick={() => navigate('/clinics')}>
-            🏥 Клиники
+          <Button size="l" stretched mode="outline" style={btnStyle} onClick={() => navigate('/clinics')}>
+            🏥 Клиники и специалисты
           </Button>
-          <Button size="l" stretched mode="outline" onClick={() => navigate('/help')}>
-            ℹ️ Помощь
+          <Button size="l" stretched mode="outline" style={btnStyle} onClick={() => navigate('/help')}>
+            ❓ F.A.Q.
           </Button>
         </div>
       </div>

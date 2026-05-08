@@ -4,6 +4,7 @@ import { Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
 import { useUserId } from '../hooks/useUserId';
+import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 
 const METRICS = [
   { id: 'heartrate', icon: '❤️', name: 'Пульс', sub: 'Apple Watch или другие умные часы' },
@@ -13,6 +14,7 @@ const METRICS = [
 ];
 
 export const MetricsSetupPage: FC = () => {
+  useTelegramBackButton();
   const navigate = useNavigate();
   const userId = useUserId();
   const [selected, setSelected] = useState<Set<string>>(new Set());

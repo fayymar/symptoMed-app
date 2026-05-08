@@ -5,8 +5,7 @@ import { Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
 import { useUserId } from '../hooks/useUserId';
-
-const SHORTCUT_URL = 'https://www.icloud.com/shortcuts/5803e08e3cf147908cae4e582fc45194';
+import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 
 const METRIC_LABELS: Record<string, string> = {
   heartrate: 'пульс',
@@ -15,7 +14,24 @@ const METRIC_LABELS: Record<string, string> = {
   steps: 'шаги',
 };
 
+const getShortcutUrl = (metrics: string[]): string => {
+  const has = (m: string) => metrics.includes(m);
+  const hr = has('heartrate');
+  const bp = has('blood_pressure');
+  const spo2 = has('spo2');
+  const steps = has('steps');
+
+  if (hr && bp && spo2 && steps) return 'https://www.icloud.com/shortcuts/570d2f3c5ac0448eb82f0ea083ca9d6f';
+  if (hr && bp && steps && !spo2) return 'https://www.icloud.com/shortcuts/bfac837f21ac4ac696062fb6047558d1';
+  if (hr && spo2 && steps && !bp) return 'https://www.icloud.com/shortcuts/8d69565ba0804dd2a8be8a340d73f7f7';
+  if (bp && steps && !hr) return 'https://www.icloud.com/shortcuts/769d71fcf72a4fa185bcd3f2f9584f5d';
+  if (hr && steps && !bp && !spo2) return 'https://www.icloud.com/shortcuts/d4342b95f70345fba9513100e7136f2f';
+  if (steps && !hr && !bp && !spo2) return 'https://www.icloud.com/shortcuts/6dd942637b8245b6969277b6109d041f';
+  return 'https://www.icloud.com/shortcuts/570d2f3c5ac0448eb82f0ea083ca9d6f';
+};
+
 export const PulseSetupPage: FC = () => {
+  useTelegramBackButton();
   const navigate = useNavigate();
   const userId = useUserId();
   const [copied, setCopied] = useState(false);
@@ -29,6 +45,8 @@ export const PulseSetupPage: FC = () => {
       } catch {}
     }
   }, []);
+
+  const shortcutUrl = getShortcutUrl(metrics);
 
   const handleCopy = () => {
     if (!userId) return;
@@ -119,7 +137,7 @@ export const PulseSetupPage: FC = () => {
         {/* Step 2 */}
         <div style={blockStyle}>
           <div style={stepTitleStyle}>2. Установите Shortcut</div>
-          <Button size="l" stretched onClick={() => window.open(SHORTCUT_URL)}>
+          <Button size="l" stretched onClick={() => window.open(shortcutUrl)}>
             Установить Shortcut
           </Button>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -164,9 +182,6 @@ export const PulseSetupPage: FC = () => {
           </button>
         </div>
 
-        <Button size="l" stretched mode="outline" onClick={() => navigate('/health')}>
-          Назад
-        </Button>
       </div>
     </Page>
   );

@@ -4,6 +4,7 @@ import { Section, Cell, List, Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
 import { useUserId } from '../hooks/useUserId';
+import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 
 interface BPRecord {
   value: number;
@@ -60,6 +61,7 @@ function mergeRecords(systolicRecords: BPRecord[], diastolicRecords: BPRecord[])
 }
 
 export const BloodPressurePage: FC = () => {
+  useTelegramBackButton();
   const navigate = useNavigate();
   const userId = useUserId();
 
@@ -180,11 +182,6 @@ export const BloodPressurePage: FC = () => {
           </List>
         )}
 
-        <div style={{ padding: '16px 16px 0' }}>
-          <Button size="l" stretched mode="outline" onClick={() => navigate('/health')}>
-            Назад
-          </Button>
-        </div>
       </div>
     </Page>
   );

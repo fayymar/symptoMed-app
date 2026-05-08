@@ -6,8 +6,10 @@ import { Page } from '@/components/Page.tsx';
 import { startConsultation } from '@/api/consultation.ts';
 import { useConsultation } from '@/contexts/ConsultationContext.tsx';
 import { useUserId } from '../hooks/useUserId';
+import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 
 export const SymptomsPage: FC = () => {
+  useTelegramBackButton();
   const navigate = useNavigate();
   const { setSessionData, setSymptoms: saveSymptoms } = useConsultation();
   const [symptoms, setSymptoms] = useState('');
@@ -63,7 +65,7 @@ export const SymptomsPage: FC = () => {
   };
 
   return (
-    <Page back={true}>
+    <Page back={false}>
       <div style={{
         display: 'flex',
         flexDirection: 'column',
@@ -91,7 +93,7 @@ export const SymptomsPage: FC = () => {
           placeholder="Например: болит голова, температура 37.5, слабость..."
           value={symptoms}
           onChange={(e) => setSymptoms(e.target.value)}
-          style={{ flex: 1, minHeight: 180 }}
+          style={{ minHeight: '100px', maxHeight: '150px' }}
         />
 
         {error && (

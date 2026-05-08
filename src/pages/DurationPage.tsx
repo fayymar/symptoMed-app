@@ -5,6 +5,7 @@ import { Button } from '@telegram-apps/telegram-ui';
 import { Page } from '@/components/Page.tsx';
 import { sendDuration } from '@/api/consultation.ts';
 import { useConsultation } from '@/contexts/ConsultationContext.tsx';
+import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 
 const DURATIONS = [
   'Сегодня',
@@ -17,6 +18,7 @@ const DURATIONS = [
 type Step = 'duration' | 'anamnesis';
 
 export const DurationPage: FC = () => {
+  useTelegramBackButton();
   const navigate = useNavigate();
   const { sessionId, setDuration, setAnamnesisData, setAnamnesisAnswer } = useConsultation();
   const [step, setStep] = useState<Step>('duration');
@@ -128,7 +130,7 @@ export const DurationPage: FC = () => {
   }
 
   return (
-    <Page back={true}>
+    <Page back={false}>
       <div style={{
         display: 'flex',
         flexDirection: 'column',

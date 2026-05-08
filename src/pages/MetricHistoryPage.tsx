@@ -4,6 +4,7 @@ import { Section, Cell, List, Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
 import { useUserId } from '../hooks/useUserId';
+import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 
 interface MetricRecord {
   value: number;
@@ -87,6 +88,7 @@ function formatDate(utcString: string): string {
 }
 
 export const MetricHistoryPage: FC = () => {
+  useTelegramBackButton();
   const { type } = useParams<{ type: string }>();
   const navigate = useNavigate();
   const config = type ? METRICS_CONFIG[type] : undefined;
@@ -213,11 +215,6 @@ export const MetricHistoryPage: FC = () => {
           </List>
         )}
 
-        <div style={{ padding: '16px 16px 0' }}>
-          <Button size="l" stretched mode="outline" onClick={() => navigate('/health')}>
-            Назад
-          </Button>
-        </div>
       </div>
     </Page>
   );

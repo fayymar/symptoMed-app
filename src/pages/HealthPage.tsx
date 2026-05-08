@@ -1,36 +1,25 @@
 import type { FC } from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
 import { useUserId } from '../hooks/useUserId';
+import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 
 type SendStatus = 'idle' | 'waiting' | 'success' | 'error';
 
-function getStoredMetrics(): string[] | null {
-  const stored = localStorage.getItem('symptomed_metrics');
-  if (stored === null) return null;
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return [];
-  }
-}
-
 export const HealthPage: FC = () => {
+  useTelegramBackButton();
   const navigate = useNavigate();
   const platform = (window as any).Telegram?.WebApp?.platform;
   const isIOS = platform === 'ios';
   const [sendStatus, setSendStatus] = useState<SendStatus>('idle');
   const userId = useUserId();
-  const [metrics] = useState<string[] | null>(getStoredMetrics);
 
-  useEffect(() => {
-    if (metrics === null) {
-      navigate('/metrics-setup', { replace: true });
-    }
-  }, [metrics, navigate]);
+  const metrics: string[] = JSON.parse(
+    localStorage.getItem('symptomed_metrics') || '["heartrate","blood_pressure","spo2","steps"]'
+  );
 
   const handleSendMetrics = () => {
     if (!userId) {
@@ -53,10 +42,6 @@ export const HealthPage: FC = () => {
     }, 10000);
   };
 
-  if (metrics === null) return null;
-
-  const activeMetrics = metrics.length > 0 ? metrics : ['heartrate', 'blood_pressure', 'spo2', 'steps'];
-
   return (
     <Page back={false}>
       <div style={{
@@ -73,7 +58,7 @@ export const HealthPage: FC = () => {
             color: 'var(--tg-theme-text-color, #000)',
             marginBottom: 8,
           }}>
-            🩺 Здоровье
+            📊 Показатели здоровья
           </div>
           <div style={{
             fontSize: 15,
@@ -147,22 +132,22 @@ export const HealthPage: FC = () => {
                 📊 История
               </div>
 
-              {activeMetrics.includes('heartrate') && (
+              {metrics.includes('heartrate') && (
                 <Button size="l" stretched mode="outline" onClick={() => navigate('/metrics/heartrate')}>
                   ❤️ Пульс
                 </Button>
               )}
-              {activeMetrics.includes('blood_pressure') && (
+              {metrics.includes('blood_pressure') && (
                 <Button size="l" stretched mode="outline" onClick={() => navigate('/metrics/blood-pressure')}>
                   🩺 Давление
                 </Button>
               )}
-              {activeMetrics.includes('spo2') && (
+              {metrics.includes('spo2') && (
                 <Button size="l" stretched mode="outline" onClick={() => navigate('/metrics/spo2')}>
                   🫁 Сатурация (SpO2)
                 </Button>
               )}
-              {activeMetrics.includes('steps') && (
+              {metrics.includes('steps') && (
                 <Button size="l" stretched mode="outline" onClick={() => navigate('/metrics/steps')}>
                   👣 Шаги
                 </Button>
@@ -177,12 +162,6 @@ export const HealthPage: FC = () => {
               </Button>
             </div>
           )}
-        </div>
-
-        <div style={{ paddingTop: 24 }}>
-          <Button size="l" stretched mode="outline" onClick={() => navigate('/')}>
-            Назад
-          </Button>
         </div>
       </div>
     </Page>

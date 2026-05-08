@@ -4,6 +4,7 @@ import { Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
 import { useUserId } from '../hooks/useUserId';
+import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 
 interface Consultation {
   id: string;
@@ -18,6 +19,7 @@ function formatDate(utcString: string): string {
 }
 
 export const HistoryPage: FC = () => {
+  useTelegramBackButton();
   const navigate = useNavigate();
   const userId = useUserId();
   const [consultations, setConsultations] = useState<Consultation[]>([]);
@@ -117,11 +119,6 @@ export const HistoryPage: FC = () => {
           </div>
         )}
 
-        <div style={{ paddingTop: 16 }}>
-          <Button size="l" stretched mode="outline" onClick={() => navigate('/')}>
-            На главную
-          </Button>
-        </div>
       </div>
     </Page>
   );

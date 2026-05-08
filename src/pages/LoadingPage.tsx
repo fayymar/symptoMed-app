@@ -4,8 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { Page } from '@/components/Page.tsx';
 import { getResult } from '@/api/consultation.ts';
 import { useConsultation } from '@/contexts/ConsultationContext.tsx';
+import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 
 export const LoadingPage: FC = () => {
+  useTelegramBackButton();
   const navigate = useNavigate();
   const { sessionId, setResult } = useConsultation();
   const called = useRef(false);

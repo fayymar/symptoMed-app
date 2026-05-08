@@ -1,8 +1,8 @@
 import { useState, type FC } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
+import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 
 const FAQ = [
   {
@@ -11,7 +11,7 @@ const FAQ = [
   },
   {
     q: 'Как подключить Apple Watch?',
-    a: 'Перейдите в раздел «Здоровье» → выберите ваши устройства → установите Shortcut → нажмите «Отправить показатели».',
+    a: 'Перейдите в раздел «Показатели здоровья» → выберите ваши устройства → установите Shortcut → нажмите «Отправить показатели».',
   },
   {
     q: 'Какие устройства поддерживаются?',
@@ -32,7 +32,7 @@ const FAQ = [
 ];
 
 export const HelpPage: FC = () => {
-  const navigate = useNavigate();
+  useTelegramBackButton();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
@@ -46,7 +46,7 @@ export const HelpPage: FC = () => {
         gap: 16,
       }}>
         <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--tg-theme-text-color, #000)', marginBottom: 4 }}>
-          ℹ️ Помощь
+          ❓ F.A.Q.
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
@@ -97,10 +97,6 @@ export const HelpPage: FC = () => {
 
         <Button size="l" stretched onClick={() => window.open('https://t.me/medgg_bot', '_blank')}>
           Написать в поддержку
-        </Button>
-
-        <Button size="l" stretched mode="outline" onClick={() => navigate('/')}>
-          На главную
         </Button>
       </div>
     </Page>

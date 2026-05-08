@@ -5,6 +5,7 @@ import { Button, Section, Cell, List } from '@telegram-apps/telegram-ui';
 import { Page } from '@/components/Page.tsx';
 import { useConsultation } from '@/contexts/ConsultationContext.tsx';
 import { useUserId } from '../hooks/useUserId';
+import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 
 const SPECIALIST_EMOJI: Record<string, string> = {
   'Терапевт': '👨‍⚕️',
@@ -24,6 +25,7 @@ function getEmoji(name: string): string {
 }
 
 export const ResultPage: FC = () => {
+  useTelegramBackButton();
   const navigate = useNavigate();
   const { result, reset } = useConsultation();
 

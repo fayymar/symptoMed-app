@@ -6,8 +6,10 @@ import { Page } from '@/components/Page.tsx';
 import { sendAnswers } from '@/api/consultation.ts';
 import { useConsultation } from '@/contexts/ConsultationContext.tsx';
 import { useUserId } from '../hooks/useUserId';
+import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 
 export const QuestionsPage: FC = () => {
+  useTelegramBackButton();
   const navigate = useNavigate();
   const { sessionId, questions, answers, setAnswer } = useConsultation();
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -75,7 +77,7 @@ export const QuestionsPage: FC = () => {
   const handleNext = () => goNext(getAnswerValue());
 
   return (
-    <Page back={true}>
+    <Page back={false}>
       <div style={{
         display: 'flex',
         flexDirection: 'column',
