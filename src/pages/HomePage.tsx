@@ -13,8 +13,7 @@ const infoColor = '#60a5fa';
 const infoSoft = 'rgba(96, 165, 250, 0.14)';
 const violetColor = '#c084fc';
 const violetSoft = 'rgba(192, 132, 252, 0.14)';
-const dangerColor = '#f87171';
-const dangerSoft = 'rgba(248, 113, 113, 0.14)';
+
 
 interface MenuItem {
   icon: string;

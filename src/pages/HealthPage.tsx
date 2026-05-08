@@ -18,7 +18,6 @@ const infoColor = '#60a5fa';
 const infoSoft = 'rgba(96, 165, 250, 0.14)';
 const dangerColor = '#f87171';
 const dangerSoft = 'rgba(248, 113, 113, 0.14)';
-const warnColor = '#fbbf24';
 const warnSoft = 'rgba(251, 191, 36, 0.14)';
 
 interface MetricCard {
