@@ -31,6 +31,7 @@ export const MetricsSetupPage: FC = () => {
   const handleContinue = async () => {
     const metrics = Array.from(selected);
     localStorage.setItem('symptomed_metrics', JSON.stringify(metrics));
+    localStorage.setItem('symptomed_metrics_setup_done', 'true');
     if (userId) {
       try {
         await fetch(`https://telegram-doctor-bot.onrender.com/api/profile/${userId}`, {

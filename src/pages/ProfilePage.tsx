@@ -1,10 +1,11 @@
 import { useState, useEffect, type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Input } from '@telegram-apps/telegram-ui';
+import { Input } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
 import { useUserId } from '../hooks/useUserId';
 import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
+import { primaryButtonStyle } from '../styles/buttons';
 
 const BASE_URL = 'https://telegram-doctor-bot.onrender.com/api/profile';
 
@@ -12,6 +13,15 @@ function toDateInputValue(raw: string | null | undefined): string {
   if (!raw) return '';
   return raw.slice(0, 10);
 }
+
+const SMOKING_LABELS: Record<string, string> = {
+  'Не курю': '🚭 Не курю',
+  'Курю': '🚬 Курю',
+  'Бросил(а)': '✅ Бросил(а)',
+  no: '🚭 Не курю',
+  yes: '🚬 Курю',
+  quit: '✅ Бросил(а)',
+};
 
 export const ProfilePage: FC = () => {
   useTelegramBackButton();
@@ -23,7 +33,6 @@ export const ProfilePage: FC = () => {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
   const [profileExists, setProfileExists] = useState(false);
-  const [medHistoryFilled, setMedHistoryFilled] = useState(false);
 
   const [fullName, setFullName] = useState('');
   const [birthdate, setBirthdate] = useState('');
@@ -31,6 +40,11 @@ export const ProfilePage: FC = () => {
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
   const [phone, setPhone] = useState('');
+
+  const [chronicDiseases, setChronicDiseases] = useState<string[]>([]);
+  const [hereditary, setHereditary] = useState<string[]>([]);
+  const [drugAllergies, setDrugAllergies] = useState('');
+  const [smoking, setSmoking] = useState('');
 
   useEffect(() => {
     if (!userId) return;
@@ -47,7 +61,10 @@ export const ProfilePage: FC = () => {
           setGender(p.gender || '');
           setHeight(p.height ? String(p.height) : '');
           setWeight(p.weight ? String(p.weight) : '');
-          setMedHistoryFilled(!!(p.chronic_diseases?.length || p.hereditary?.length));
+          setChronicDiseases(p.chronic_diseases || []);
+          setHereditary(p.hereditary || []);
+          setDrugAllergies(p.drug_allergies || '');
+          setSmoking(p.smoking || '');
           setProfileExists(true);
         }
       })
@@ -106,6 +123,8 @@ export const ProfilePage: FC = () => {
     background: 'transparent',
   };
 
+  const medHistoryFilled = chronicDiseases.length > 0 || hereditary.length > 0;
+
   if (loading) {
     return (
       <Page back={false}>
@@ -147,7 +166,7 @@ export const ProfilePage: FC = () => {
             color: 'var(--tg-theme-hint-color, #888)',
             lineHeight: 1.6,
           }}>
-            ℹ️ Данные профиля используются AI при диагностике для более точных рекомендаций с учётом вашего возраста, пола и физических параметров.
+            ℹ️ Данные профиля используются при диагностике для более точных рекомендаций с учётом вашего возраста, пола и физических параметров.
           </div>
         )}
 
@@ -252,18 +271,78 @@ export const ProfilePage: FC = () => {
           </div>
         )}
 
-        <div>
-          <Button size="l" stretched mode="outline" onClick={() => navigate('/medical-history')}>
-            📋 Медицинская история
-          </Button>
-          <div style={{ fontSize: 12, color: medHistoryFilled ? '#34C759' : 'var(--tg-theme-hint-color, #999)', textAlign: 'center', marginTop: 6 }}>
-            {medHistoryFilled ? '✅ Заполнено' : 'Не заполнено · Влияет на точность диагностики'}
-          </div>
-        </div>
-
-        <Button size="l" stretched disabled={saving} onClick={handleSave}>
+        <button style={primaryButtonStyle} disabled={saving} onClick={handleSave}>
           {saved ? '✅ Сохранено' : saving ? 'Сохранение...' : '💾 Сохранить'}
-        </Button>
+        </button>
+
+        {/* Medical history section */}
+        <div style={{
+          marginTop: 4,
+          padding: '16px',
+          backgroundColor: 'var(--tg-theme-secondary-bg-color, #f4f4f5)',
+          borderRadius: 12,
+        }}>
+          <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--tg-theme-text-color, #000)', marginBottom: 12 }}>
+            📋 Медицинская история
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--tg-theme-hint-color, #999)', marginBottom: 2 }}>
+                Хронические заболевания
+              </div>
+              <div style={{ fontSize: 14, color: 'var(--tg-theme-text-color, #000)', lineHeight: 1.5 }}>
+                {chronicDiseases.length > 0 ? chronicDiseases.join(', ') : 'Не указано'}
+              </div>
+            </div>
+
+            <div style={{ height: 1, background: 'var(--tg-theme-bg-color, rgba(0,0,0,0.06))' }} />
+
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--tg-theme-hint-color, #999)', marginBottom: 2 }}>
+                Наследственность
+              </div>
+              <div style={{ fontSize: 14, color: 'var(--tg-theme-text-color, #000)', lineHeight: 1.5 }}>
+                {hereditary.length > 0 ? hereditary.join(', ') : 'Не указано'}
+              </div>
+            </div>
+
+            <div style={{ height: 1, background: 'var(--tg-theme-bg-color, rgba(0,0,0,0.06))' }} />
+
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--tg-theme-hint-color, #999)', marginBottom: 2 }}>
+                Аллергии на лекарства
+              </div>
+              <div style={{ fontSize: 14, color: 'var(--tg-theme-text-color, #000)' }}>
+                {drugAllergies || 'Не указано'}
+              </div>
+            </div>
+
+            <div style={{ height: 1, background: 'var(--tg-theme-bg-color, rgba(0,0,0,0.06))' }} />
+
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--tg-theme-hint-color, #999)', marginBottom: 2 }}>
+                Курение
+              </div>
+              <div style={{ fontSize: 14, color: 'var(--tg-theme-text-color, #000)' }}>
+                {smoking ? (SMOKING_LABELS[smoking] || smoking) : 'Не указано'}
+              </div>
+            </div>
+          </div>
+
+          <button
+            style={{ ...primaryButtonStyle, marginTop: 14, marginBottom: 0 }}
+            onClick={() => navigate('/medical-history')}
+          >
+            ✏️ Обновить медицинскую историю
+          </button>
+
+          {!medHistoryFilled && (
+            <div style={{ fontSize: 12, color: 'var(--tg-theme-hint-color, #999)', textAlign: 'center', marginTop: 6 }}>
+              Не заполнено · Влияет на точность диагностики
+            </div>
+          )}
+        </div>
       </div>
     </Page>
   );

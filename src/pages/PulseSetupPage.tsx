@@ -8,10 +8,10 @@ import { useUserId } from '../hooks/useUserId';
 import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 
 const METRIC_LABELS: Record<string, string> = {
-  heartrate: 'пульс',
-  blood_pressure: 'давление',
-  spo2: 'SpO2',
-  steps: 'шаги',
+  heartrate: '❤️ Пульс',
+  blood_pressure: '🩺 Давление',
+  spo2: '🫁 SpO2',
+  steps: '👣 Шаги',
 };
 
 const getShortcutUrl = (metrics: string[]): string => {
@@ -100,6 +100,43 @@ export const PulseSetupPage: FC = () => {
           </div>
         </div>
 
+        {/* Selected metrics block */}
+        {metrics.length > 0 && (
+          <div style={{
+            background: 'var(--tg-theme-secondary-bg-color, #f4f4f5)',
+            borderRadius: 12,
+            padding: '12px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 8,
+          }}>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--tg-theme-hint-color, #999)', marginBottom: 4 }}>
+                Выбранные показатели
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--tg-theme-text-color, #000)' }}>
+                {metrics.map((m) => METRIC_LABELS[m] ?? m).join(', ')}
+              </div>
+            </div>
+            <button
+              onClick={() => navigate('/metrics-setup')}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--tg-theme-button-color, #2481cc)',
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+              }}
+            >
+              Изменить →
+            </button>
+          </div>
+        )}
+
         {/* Step 1 */}
         <div style={blockStyle}>
           <div style={stepTitleStyle}>1. Скопируйте ваш код</div>
@@ -165,22 +202,6 @@ export const PulseSetupPage: FC = () => {
           </Button>
         </div>
 
-        {/* Change metrics */}
-        <div style={{ textAlign: 'center' }}>
-          <button
-            onClick={() => navigate('/metrics-setup')}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--tg-theme-hint-color, #999)',
-              fontSize: 13,
-              cursor: 'pointer',
-              textDecoration: 'underline',
-            }}
-          >
-            Изменить набор показателей
-          </button>
-        </div>
 
       </div>
     </Page>

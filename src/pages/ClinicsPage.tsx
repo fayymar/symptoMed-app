@@ -1,8 +1,7 @@
 import { useState, useEffect, type FC } from 'react';
-import { Button } from '@telegram-apps/telegram-ui';
-
 import { Page } from '@/components/Page.tsx';
 import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
+import { primaryButtonStyle } from '../styles/buttons';
 
 interface Clinic {
   name: string;
@@ -56,24 +55,35 @@ export const ClinicsPage: FC = () => {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationDenied, setLocationDenied] = useState(false);
 
-  useEffect(() => {
+  const tryBrowserLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
         () => setLocationDenied(true),
+        { timeout: 10000 },
       );
-    }
-  }, []);
-
-  const requestLocation = () => {
-    if (navigator.geolocation) {
-      setLocationDenied(false);
-      navigator.geolocation.getCurrentPosition(
-        (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        () => setLocationDenied(true),
-      );
+    } else {
+      setLocationDenied(true);
     }
   };
+
+  const requestLocation = () => {
+    setLocationDenied(false);
+    const tg = (window as any).Telegram?.WebApp;
+    if (tg && tg.requestLocation) {
+      tg.requestLocation((locationData: any) => {
+        if (locationData) {
+          setUserLocation({ lat: locationData.latitude, lng: locationData.longitude });
+        } else {
+          tryBrowserLocation();
+        }
+      });
+    } else {
+      tryBrowserLocation();
+    }
+  };
+
+  useEffect(() => { requestLocation(); }, []);
 
   const filtered = CLINICS.filter((c) => {
     const matchSpec =
@@ -185,14 +195,12 @@ export const ClinicsPage: FC = () => {
           <>
             {/* Geolocation sort button */}
             {userLocation && (
-              <Button
-                size="m"
-                stretched
-                mode="outline"
+              <button
+                style={{ ...primaryButtonStyle, marginBottom: 0 }}
                 onClick={() => alert('Сортировка по расстоянию: функция в разработке')}
               >
                 📍 Рядом со мной
-              </Button>
+              </button>
             )}
 
             {/* Specialization filter */}
@@ -269,7 +277,7 @@ export const ClinicsPage: FC = () => {
                       </button>
                       <button
                         style={btnBase}
-                        onClick={() => window.open(`https://maps.google.com/?q=${encodeURIComponent(clinic.address)}`)}
+                        onClick={() => window.open(`https://maps.yandex.ru/?text=${encodeURIComponent(clinic.address)}`, '_blank')}
                       >
                         На карте
                       </button>

@@ -13,7 +13,15 @@ export const useUserId = () => {
       // Способ 1: initDataUnsafe (работает на большинстве устройств)
       const idFromUnsafe = tg.initDataUnsafe?.user?.id;
       if (idFromUnsafe) {
-        setUserId(Number(idFromUnsafe));
+        const id = Number(idFromUnsafe);
+        const prevUserId = localStorage.getItem('symptomed_user_id');
+        if (prevUserId && prevUserId !== String(id)) {
+          localStorage.removeItem('symptomed_metrics');
+          localStorage.removeItem('symptomed_metrics_setup_done');
+          console.log('New user detected, cleared previous user data');
+        }
+        localStorage.setItem('symptomed_user_id', String(id));
+        setUserId(id);
         return true;
       }
 
@@ -26,7 +34,15 @@ export const useUserId = () => {
           if (userStr) {
             const user = JSON.parse(decodeURIComponent(userStr));
             if (user?.id) {
-              setUserId(Number(user.id));
+              const id = Number(user.id);
+              const prevUserId = localStorage.getItem('symptomed_user_id');
+              if (prevUserId && prevUserId !== String(id)) {
+                localStorage.removeItem('symptomed_metrics');
+                localStorage.removeItem('symptomed_metrics_setup_done');
+                console.log('New user detected, cleared previous user data');
+              }
+              localStorage.setItem('symptomed_user_id', String(id));
+              setUserId(id);
               return true;
             }
           }

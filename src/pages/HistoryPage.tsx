@@ -1,10 +1,9 @@
 import { useState, useEffect, type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@telegram-apps/telegram-ui';
-
 import { Page } from '@/components/Page.tsx';
 import { useUserId } from '../hooks/useUserId';
 import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
+import { primaryButtonStyle } from '../styles/buttons';
 
 interface Consultation {
   id: string;
@@ -83,11 +82,11 @@ export const HistoryPage: FC = () => {
               У вас пока нет консультаций
             </div>
             <div style={{ fontSize: 14, color: 'var(--tg-theme-hint-color, #999)', textAlign: 'center', lineHeight: 1.5 }}>
-              Начните первую консультацию чтобы получить рекомендации AI-врача.
+              Начните первую консультацию чтобы получить рекомендации врача.
             </div>
-            <Button size="l" stretched onClick={() => navigate('/symptoms')}>
+            <button style={primaryButtonStyle} onClick={() => navigate('/symptoms')}>
               Начать консультацию
-            </Button>
+            </button>
           </div>
         ) : (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12, marginTop: 16 }}>

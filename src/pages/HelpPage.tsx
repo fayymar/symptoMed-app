@@ -1,8 +1,8 @@
 import { useState, type FC } from 'react';
-import { Button } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
 import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
+import { primaryButtonStyle } from '../styles/buttons';
 
 const FAQ = [
   {
@@ -19,7 +19,7 @@ const FAQ = [
   },
   {
     q: 'Почему бот рекомендует именно этих специалистов?',
-    a: 'AI анализирует ваши симптомы, давность, анамнез и показатели здоровья. Рекомендация — это предварительная оценка, не замена визиту к врачу.',
+    a: 'Система анализирует ваши симптомы, давность, анамнез и показатели здоровья. Рекомендация — это предварительная оценка, не замена визиту к врачу.',
   },
   {
     q: 'Безопасны ли мои данные?',
@@ -95,9 +95,9 @@ export const HelpPage: FC = () => {
           ))}
         </div>
 
-        <Button size="l" stretched onClick={() => window.open('https://t.me/medgg_bot', '_blank')}>
+        <button style={primaryButtonStyle} onClick={() => window.open('https://t.me/medgg_bot', '_blank')}>
           Написать в поддержку
-        </Button>
+        </button>
       </div>
     </Page>
   );

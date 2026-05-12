@@ -5,12 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import { Page } from '@/components/Page.tsx';
 import { useUserId } from '../hooks/useUserId';
 import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
+import { primaryButtonStyle } from '../styles/buttons';
 
 type SendStatus = 'idle' | 'waiting' | 'success' | 'error';
 
 // Design tokens
 const accent = '#f5b942';
-const accentInk = '#1c1000';
 const accentSoft = 'rgba(245, 185, 66, 0.14)';
 const okColor = '#34d399';
 const okSoft = 'rgba(52, 211, 153, 0.14)';
@@ -160,24 +160,10 @@ export const HealthPage: FC = () => {
                 disabled={sendStatus === 'waiting'}
                 onClick={handleSendMetrics}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 8,
-                  width: '100%',
+                  ...primaryButtonStyle,
+                  marginBottom: 0,
                   height: 56,
-                  borderRadius: 16,
-                  background: sendStatus === 'success' ? okSoft : accent,
-                  color: sendStatus === 'success' ? okColor : accentInk,
-                  fontSize: 15,
-                  fontWeight: 600,
-                  letterSpacing: '-0.01em',
-                  border: 'none',
-                  cursor: sendStatus === 'waiting' ? 'not-allowed' : 'pointer',
                   opacity: sendStatus === 'waiting' ? 0.6 : 1,
-                  fontFamily: 'inherit',
-                  boxShadow: sendStatus === 'success' ? 'none' : `0 4px 20px rgba(245, 185, 66, 0.25)`,
-                  transition: 'background 0.2s, color 0.2s, transform 0.1s',
                 }}
               >
                 {sendStatus === 'idle' && '📤 Отправить показатели сейчас'}

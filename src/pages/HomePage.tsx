@@ -2,10 +2,10 @@ import { type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Page } from '@/components/Page.tsx';
+import { primaryButtonStyle } from '../styles/buttons';
 
 // Design tokens from SymptoMed Redesign
 const accent = '#f5b942';
-const accentInk = '#1c1000';
 const accentSoft = 'rgba(245, 185, 66, 0.14)';
 const okColor = '#34d399';
 const okSoft = 'rgba(52, 211, 153, 0.14)';
@@ -86,7 +86,7 @@ export const HomePage: FC = () => {
               lineHeight: 1.4,
               textAlign: 'center',
             }}>
-              AI-диагностика на основе симптомов
+              Опишите симптомы — получите рекомендацию специалиста
             </div>
           </div>
         </div>
@@ -95,28 +95,7 @@ export const HomePage: FC = () => {
         <div style={{ padding: '0 16px', marginBottom: 8 }}>
           <button
             onClick={() => navigate('/symptoms')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%',
-              height: 56,
-              borderRadius: 16,
-              background: accent,
-              color: accentInk,
-              fontSize: 15,
-              fontWeight: 600,
-              letterSpacing: '-0.01em',
-              border: 'none',
-              cursor: 'pointer',
-              fontFamily: 'inherit',
-              boxShadow: `0 4px 20px rgba(245, 185, 66, 0.30)`,
-              transition: 'transform 0.1s, opacity 0.15s',
-            }}
-            onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.985)')}
-            onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-            onTouchStart={(e) => (e.currentTarget.style.transform = 'scale(0.985)')}
-            onTouchEnd={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+            style={{ ...primaryButtonStyle, marginBottom: 0, height: 56, borderRadius: 16, fontSize: 15 }}
           >
             Начать консультацию
           </button>
