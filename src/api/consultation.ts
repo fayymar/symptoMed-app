@@ -48,13 +48,14 @@ export async function sendAnswers(
   userId: number,
   answers: string[],
 ): Promise<void> {
+  // Fix: send plain string array, not objects
   const response = await fetch(`${BASE_URL}/answer`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       session_id: sessionId,
       user_id: userId,
-      answers: answers.map((answer, index) => ({ question_index: index, answer })),
+      answers: answers, // plain strings, not objects
     }),
   });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -73,11 +74,18 @@ export async function sendDuration(
   return response.json();
 }
 
-export async function getResult(sessionId: string): Promise<ResultResponse> {
+export async function getResult(
+  sessionId: string,
+  anamnesisAnswers?: string[],
+): Promise<ResultResponse> {
+  // Fix: send anamnesis_answers so backend can use them in AI prompt
   const response = await fetch(`${BASE_URL}/result`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ session_id: sessionId }),
+    body: JSON.stringify({
+      session_id: sessionId,
+      anamnesis_answers: anamnesisAnswers ?? [],
+    }),
   });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   return response.json();

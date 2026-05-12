@@ -9,7 +9,8 @@ import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 export const LoadingPage: FC = () => {
   useTelegramBackButton();
   const navigate = useNavigate();
-  const { sessionId, setResult } = useConsultation();
+  // Fix: also read anamnesisAnswers from context and pass to getResult
+  const { sessionId, anamnesisAnswers, setResult } = useConsultation();
   const called = useRef(false);
 
   useEffect(() => {
@@ -21,7 +22,7 @@ export const LoadingPage: FC = () => {
       return;
     }
 
-    getResult(sessionId)
+    getResult(sessionId, anamnesisAnswers)
       .then((data) => {
         setResult({
           urgency: data.urgency,
@@ -32,10 +33,9 @@ export const LoadingPage: FC = () => {
         navigate('/result');
       })
       .catch(() => {
-        // On error still navigate to result — ResultPage will show stored state or error
         navigate('/result');
       });
-  }, [sessionId, setResult, navigate]);
+  }, [sessionId, anamnesisAnswers, setResult, navigate]);
 
   return (
     <Page back={false}>
