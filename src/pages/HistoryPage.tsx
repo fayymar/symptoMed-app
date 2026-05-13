@@ -9,7 +9,7 @@ interface Consultation {
   id: string;
   created_at: string;
   symptoms: string;
-  specialist?: string;
+  recommended_doctor?: string;
 }
 
 function formatDate(utcString: string): string {
@@ -33,7 +33,7 @@ export const HistoryPage: FC = () => {
         return res.json();
       })
       .then((data) => {
-        const list = data.consultations ?? [];
+        const list = data.records ?? [];
         if (list.length === 0) setPlaceholder(true);
         else setConsultations(list);
       })
@@ -108,7 +108,7 @@ export const HistoryPage: FC = () => {
                 <div style={{ fontSize: 14, color: 'var(--tg-theme-text-color, #000)', lineHeight: 1.4 }}>
                   {c.symptoms.length > 80 ? c.symptoms.slice(0, 80) + '...' : c.symptoms}
                 </div>
-                {c.specialist && (
+                {c.recommended_doctor && (
                   <div style={{ fontSize: 13, color: 'var(--tg-theme-button-color, #2481cc)', fontWeight: 500 }}>
                     → {c.specialist}
                   </div>
