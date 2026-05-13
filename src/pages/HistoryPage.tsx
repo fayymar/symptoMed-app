@@ -110,7 +110,7 @@ export const HistoryPage: FC = () => {
                 </div>
                 {c.recommended_doctor && (
                   <div style={{ fontSize: 13, color: 'var(--tg-theme-button-color, #2481cc)', fontWeight: 500 }}>
-                    → {c.specialist}
+                    → {c.recommended_doctor}
                   </div>
                 )}
               </div>
