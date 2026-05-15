@@ -26,7 +26,7 @@ interface MenuItem {
 
 const MENU_ITEMS: MenuItem[] = [
   { icon: '📋', label: 'История консультаций', sub: 'Ваши прошлые консультации', path: '/history', plateBg: infoSoft, plateColor: infoColor },
-  { icon: '📊', label: 'Показатели здоровья', sub: 'Apple Watch и умные часы', path: '/health', plateBg: okSoft, plateColor: okColor },
+  // HIDDEN: { icon: '📊', label: 'Показатели здоровья', sub: 'Apple Watch и умные часы', path: '/health', plateBg: okSoft, plateColor: okColor },
   { icon: '👤', label: 'Профиль', sub: 'Личные данные и анамнез', path: '/profile', plateBg: accentSoft, plateColor: accent },
   { icon: '🏥', label: 'Клиники и специалисты', sub: 'Медицинские учреждения', path: '/clinics', plateBg: violetSoft, plateColor: violetColor },
   { icon: '❓', label: 'F.A.Q.', sub: 'Частые вопросы', path: '/help', plateBg: 'rgba(255,255,255,0.06)', plateColor: 'var(--tg-theme-hint-color, #9ba3b5)' },
