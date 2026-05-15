@@ -7,8 +7,6 @@ import { primaryButtonStyle } from '../styles/buttons';
 // Design tokens from SymptoMed Redesign
 const accent = '#f5b942';
 const accentSoft = 'rgba(245, 185, 66, 0.14)';
-const okColor = '#34d399';
-const okSoft = 'rgba(52, 211, 153, 0.14)';
 const infoColor = '#60a5fa';
 const infoSoft = 'rgba(96, 165, 250, 0.14)';
 const violetColor = '#c084fc';
