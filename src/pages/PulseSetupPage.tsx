@@ -58,7 +58,7 @@ export const PulseSetupPage: FC = () => {
 
   const handleTest = () => {
     if (!userId) return;
-    window.open(`shortcuts://run-shortcut?name=СимптоМед%20—%20Здоровье&input=${userId}`);
+    window.open(`shortcuts://run-shortcut?name=Symed%20—%20Здоровье&input=${userId}`);
   };
 
   const metricsLabel = metrics.length > 0

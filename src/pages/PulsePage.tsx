@@ -15,7 +15,7 @@ export const PulsePage: FC = () => {
       alert('Откройте приложение через бота');
       return;
     }
-    window.open(`shortcuts://run-shortcut?name=СимптоМед%20-%20Пульс&input=${userId}`);
+    window.open(`shortcuts://run-shortcut?name=Symed%20-%20Пульс&input=${userId}`);
   };
 
   return (

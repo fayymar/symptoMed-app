@@ -74,7 +74,7 @@ export const HomePage: FC = () => {
               letterSpacing: '-0.01em',
               color: accent,
             }}>
-              СимптоМед
+              Symed
             </div>
             <div style={{
               fontSize: 14,

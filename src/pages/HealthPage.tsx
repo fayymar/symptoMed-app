@@ -54,7 +54,7 @@ export const HealthPage: FC = () => {
       alert('Откройте приложение через бота');
       return;
     }
-    window.open(`shortcuts://run-shortcut?name=СимптоМед%20-%20Здоровье&input=${userId}`);
+    window.open(`shortcuts://run-shortcut?name=Symed%20-%20Здоровье&input=${userId}`);
     setSendStatus('waiting');
 
     setTimeout(() => {
