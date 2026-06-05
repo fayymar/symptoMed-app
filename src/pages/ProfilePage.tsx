@@ -50,9 +50,11 @@ export const ProfilePage: FC = () => {
     if (!userId) return;
     setLoading(true);
     fetch(`${BASE_URL}/${userId}`)
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
       .then((data) => {
-        console.log('Profile data:', data);
         if (data.exists && data.profile) {
           const p = data.profile;
           setFullName(p.full_name || '');
@@ -68,7 +70,10 @@ export const ProfilePage: FC = () => {
           setProfileExists(true);
         }
       })
-      .catch((e) => console.error('Profile fetch error:', e))
+      .catch((e) => {
+        console.error('Profile fetch error:', e);
+        setError('Не удалось загрузить профиль. Попробуйте позже.');
+      })
       .finally(() => setLoading(false));
   }, [userId]);
 

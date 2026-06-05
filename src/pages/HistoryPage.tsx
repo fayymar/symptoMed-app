@@ -23,23 +23,28 @@ export const HistoryPage: FC = () => {
   const userId = useUserId();
   const [consultations, setConsultations] = useState<Consultation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [placeholder, setPlaceholder] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!userId) return;
+    setLoading(true);
+    setError('');
     fetch(`https://telegram-doctor-bot.onrender.com/api/consultations/${userId}`)
       .then((res) => {
-        if (!res.ok) throw new Error();
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       })
       .then((data) => {
-        const list = data.records ?? [];
-        if (list.length === 0) setPlaceholder(true);
-        else setConsultations(list);
+        setConsultations(data.records ?? []);
       })
-      .catch(() => setPlaceholder(true))
+      .catch((e) => {
+        console.error('History fetch error:', e);
+        setError('Не удалось загрузить историю. Проверьте соединение.');
+      })
       .finally(() => setLoading(false));
   }, [userId]);
+
+  const isEmpty = !loading && !error && consultations.length === 0;
 
   if (loading) {
     return (
@@ -67,15 +72,21 @@ export const HistoryPage: FC = () => {
           📋 История консультаций
         </div>
 
-        {placeholder ? (
+        {error && (
           <div style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 16,
-            padding: '0 16px',
+            marginTop: 24, padding: '14px 16px', borderRadius: 12,
+            background: 'rgba(236,57,66,0.08)', color: '#ec3942',
+            fontSize: 14, textAlign: 'center', lineHeight: 1.5,
+          }}>
+            {error}
+          </div>
+        )}
+
+        {isEmpty && (
+          <div style={{
+            flex: 1, display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            gap: 16, padding: '0 16px',
           }}>
             <div style={{ fontSize: 48 }}>📋</div>
             <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--tg-theme-text-color, #000)', textAlign: 'center' }}>
@@ -88,7 +99,9 @@ export const HistoryPage: FC = () => {
               Начать консультацию
             </button>
           </div>
-        ) : (
+        )}
+
+        {consultations.length > 0 && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12, marginTop: 16 }}>
             {consultations.map((c) => (
               <div
@@ -109,7 +122,7 @@ export const HistoryPage: FC = () => {
                   {c.symptoms.length > 80 ? c.symptoms.slice(0, 80) + '...' : c.symptoms}
                 </div>
                 {c.recommended_doctor && (
-                  <div style={{ fontSize: 13, color: 'var(--tg-theme-button-color, #2481cc)', fontWeight: 500 }}>
+                  <div style={{ fontSize: 13, color: '#FFDD2D', fontWeight: 500 }}>
                     → {c.recommended_doctor}
                   </div>
                 )}
@@ -117,7 +130,6 @@ export const HistoryPage: FC = () => {
             ))}
           </div>
         )}
-
       </div>
     </Page>
   );
