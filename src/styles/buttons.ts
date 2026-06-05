@@ -3,8 +3,8 @@ import type React from 'react';
 export const primaryButtonStyle: React.CSSProperties = {
   width: '100%',
   marginBottom: '10px',
-  backgroundColor: 'var(--tg-theme-button-color, #2481cc)',
-  color: 'var(--tg-theme-button-text-color, #ffffff)',
+  backgroundColor: '#FFDD2D',
+  color: 'rgba(0,0,0,0.8)',
   border: 'none',
   borderRadius: '12px',
   padding: '14px 16px',

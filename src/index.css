@@ -1,5 +1,21 @@
+:root {
+  --sy-primary:        #FFDD2D;
+  --sy-primary-hover:  #FCC521;
+  --sy-primary-active: #FAB619;
+  --sy-on-primary:     rgba(0,0,0,0.8);
+  --sy-bg:             #F5F5F6;
+  --sy-surface:        #FFFFFF;
+  --sy-border:         #DDDDDD;
+  --sy-text:           #333333;
+  --sy-text-secondary: #666666;
+  --sy-red:            #ec3942;
+  --sy-green:          #34C759;
+  --sy-orange:         #FF9500;
+}
+
 body {
-  background: var(--tg-theme-secondary-bg-color, white);
+  background: var(--tg-theme-secondary-bg-color, var(--sy-bg));
+  color: var(--tg-theme-text-color, var(--sy-text));
   padding: 0;
   margin: 0;
 }
