@@ -120,7 +120,7 @@ export const ProfilePage: FC = () => {
     flex: 1,
     padding: '10px 0',
     borderRadius: 10,
-    border: '1.5px solid var(--tg-theme-button-color, #2481cc)',
+    border: '1.5px solid #10A875',
     fontSize: 15,
     fontWeight: 600,
     cursor: 'pointer',
@@ -200,8 +200,8 @@ export const ProfilePage: FC = () => {
             <button
               style={{
                 ...toggleBtnBase,
-                background: gender === 'male' ? 'var(--tg-theme-button-color, #2481cc)' : 'transparent',
-                color: gender === 'male' ? 'var(--tg-theme-button-text-color, #fff)' : 'var(--tg-theme-button-color, #2481cc)',
+                background: gender === 'male' ? 'var(--tg-theme-button-color, #10A875)' : 'transparent',
+                color: gender === 'male' ? 'var(--tg-theme-button-text-color, #fff)' : 'var(--tg-theme-button-color, #10A875)',
               }}
               onClick={() => setGender('male')}
             >
@@ -210,8 +210,8 @@ export const ProfilePage: FC = () => {
             <button
               style={{
                 ...toggleBtnBase,
-                background: gender === 'female' ? 'var(--tg-theme-button-color, #2481cc)' : 'transparent',
-                color: gender === 'female' ? 'var(--tg-theme-button-text-color, #fff)' : 'var(--tg-theme-button-color, #2481cc)',
+                background: gender === 'female' ? 'var(--tg-theme-button-color, #10A875)' : 'transparent',
+                color: gender === 'female' ? 'var(--tg-theme-button-text-color, #fff)' : 'var(--tg-theme-button-color, #10A875)',
               }}
               onClick={() => setGender('female')}
             >

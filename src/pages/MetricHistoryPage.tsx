@@ -30,7 +30,7 @@ const COLOR_MAP: Record<string, string> = {
   red: '#ec3942',
   orange: '#FF9500',
   green: '#34C759',
-  blue: '#2481cc',
+  blue: '#10A875',
 };
 
 const METRICS_CONFIG: Record<string, MetricConfig> = {

@@ -1,16 +1,17 @@
 :root {
-  --sy-primary:        #FFDD2D;
-  --sy-primary-hover:  #FCC521;
-  --sy-primary-active: #FAB619;
-  --sy-on-primary:     rgba(0,0,0,0.8);
-  --sy-bg:             #F5F5F6;
+  --sy-primary:        #10A875;
+  --sy-primary-hover:  #0D9065;
+  --sy-primary-active: #0B7A55;
+  --sy-on-primary:     #FFFFFF;
+  --sy-bg:             #F5FFFB;
   --sy-surface:        #FFFFFF;
-  --sy-border:         #DDDDDD;
-  --sy-text:           #333333;
-  --sy-text-secondary: #666666;
-  --sy-red:            #ec3942;
-  --sy-green:          #34C759;
-  --sy-orange:         #FF9500;
+  --sy-border:         #C2E8DE;
+  --sy-text:           #102A27;
+  --sy-text-secondary: #2D5E55;
+  --sy-accent:         #2DD4BF;
+  --sy-red:            #EF4444;
+  --sy-green:          #22C55E;
+  --sy-orange:         #F59E0B;
 }
 
 body {

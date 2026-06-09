@@ -10,8 +10,8 @@ import { primaryButtonStyle } from '../styles/buttons';
 type SendStatus = 'idle' | 'waiting' | 'success' | 'error';
 
 // Design tokens
-const accent = '#FFDD2D';
-const accentSoft = 'rgba(255,221,45, 0.14)';
+const accent = '#10A875';
+const accentSoft = 'rgba(16,168,117,0.14)';
 const okColor = '#34d399';
 const okSoft = 'rgba(52, 211, 153, 0.14)';
 const infoColor = '#60a5fa';

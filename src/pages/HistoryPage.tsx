@@ -122,7 +122,7 @@ export const HistoryPage: FC = () => {
                   {c.symptoms.length > 80 ? c.symptoms.slice(0, 80) + '...' : c.symptoms}
                 </div>
                 {c.recommended_doctor && (
-                  <div style={{ fontSize: 13, color: '#FFDD2D', fontWeight: 500 }}>
+                  <div style={{ fontSize: 13, color: '#10A875', fontWeight: 500 }}>
                     → {c.recommended_doctor}
                   </div>
                 )}

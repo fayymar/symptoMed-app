@@ -102,12 +102,12 @@ export const ClinicsPage: FC = () => {
     flex: 1,
     padding: '8px 0',
     borderRadius: 8,
-    border: '1.5px solid var(--tg-theme-button-color, #2481cc)',
+    border: '1.5px solid #10A875',
     fontSize: 13,
     fontWeight: 600,
     cursor: 'pointer',
     background: 'transparent',
-    color: 'var(--tg-theme-button-color, #2481cc)',
+    color: 'var(--tg-theme-button-color, #10A875)',
   };
 
   return (
@@ -149,7 +149,7 @@ export const ClinicsPage: FC = () => {
                 padding: '6px 12px',
                 borderRadius: 8,
                 border: 'none',
-                background: 'var(--tg-theme-button-color, #2481cc)',
+                background: 'var(--tg-theme-button-color, #10A875)',
                 color: 'var(--tg-theme-button-text-color, #fff)',
                 fontSize: 13,
                 fontWeight: 600,
@@ -213,12 +213,12 @@ export const ClinicsPage: FC = () => {
                     flexShrink: 0,
                     padding: '6px 14px',
                     borderRadius: 20,
-                    border: '1.5px solid var(--tg-theme-button-color, #2481cc)',
+                    border: '1.5px solid #10A875',
                     fontSize: 13,
                     fontWeight: 500,
                     cursor: 'pointer',
-                    background: selectedSpec === spec ? 'var(--tg-theme-button-color, #2481cc)' : 'transparent',
-                    color: selectedSpec === spec ? 'var(--tg-theme-button-text-color, #fff)' : 'var(--tg-theme-button-color, #2481cc)',
+                    background: selectedSpec === spec ? 'var(--tg-theme-button-color, #10A875)' : 'transparent',
+                    color: selectedSpec === spec ? 'var(--tg-theme-button-text-color, #fff)' : 'var(--tg-theme-button-color, #10A875)',
                     transition: 'background 0.15s',
                   }}
                 >

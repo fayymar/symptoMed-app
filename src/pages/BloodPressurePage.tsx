@@ -20,7 +20,7 @@ function getStatus(systolic: number, diastolic: number): { label: string; color:
   if (systolic >= 140 || diastolic >= 90) return { label: 'Высокое', color: '#ec3942' };
   if ((systolic >= 130 && systolic < 140) || (diastolic >= 85 && diastolic < 90))
     return { label: 'Слегка повышенное', color: '#FF9500' };
-  if (systolic < 90 || diastolic < 60) return { label: 'Пониженное', color: '#2481cc' };
+  if (systolic < 90 || diastolic < 60) return { label: 'Пониженное', color: '#10A875' };
   return { label: 'Норма', color: '#34C759' };
 }
 

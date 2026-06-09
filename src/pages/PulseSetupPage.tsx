@@ -124,7 +124,7 @@ export const PulseSetupPage: FC = () => {
               style={{
                 background: 'none',
                 border: 'none',
-                color: 'var(--tg-theme-button-color, #2481cc)',
+                color: 'var(--tg-theme-button-color, #10A875)',
                 fontSize: 13,
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -144,7 +144,7 @@ export const PulseSetupPage: FC = () => {
             <>
               <div style={{
                 background: 'var(--tg-theme-bg-color, #fff)',
-                border: '2px solid var(--tg-theme-button-color, #2481cc)',
+                border: '2px solid var(--tg-theme-button-color, #10A875)',
                 borderRadius: 12,
                 padding: '14px 16px',
                 textAlign: 'center',

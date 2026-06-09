@@ -5,8 +5,8 @@ import { Page } from '@/components/Page.tsx';
 import { primaryButtonStyle } from '../styles/buttons';
 
 // Design tokens from SymptoMed Redesign
-const accent = '#FFDD2D';
-const accentSoft = 'rgba(255,221,45, 0.14)';
+const accent = '#10A875';
+const accentSoft = 'rgba(16,168,117,0.14)';
 const infoColor = '#60a5fa';
 const infoSoft = 'rgba(96, 165, 250, 0.14)';
 const violetColor = '#c084fc';

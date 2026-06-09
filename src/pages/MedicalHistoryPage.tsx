@@ -91,7 +91,7 @@ export const MedicalHistoryPage: FC = () => {
         style={{
           padding: '12px 14px',
           borderRadius: 10,
-          border: `1.5px solid ${isSelected ? 'var(--tg-theme-button-color, #2481cc)' : 'var(--tg-theme-secondary-bg-color, #e0e0e0)'}`,
+          border: `1.5px solid ${isSelected ? 'var(--tg-theme-button-color, #10A875)' : 'var(--tg-theme-secondary-bg-color, #e0e0e0)'}`,
           background: isSelected ? 'rgba(36, 129, 204, 0.07)' : 'var(--tg-theme-secondary-bg-color, #f4f4f5)',
           cursor: 'pointer',
           display: 'flex',
@@ -103,7 +103,7 @@ export const MedicalHistoryPage: FC = () => {
       >
         <span style={{ fontSize: 14, color: 'var(--tg-theme-text-color, #000)', lineHeight: 1.4 }}>{item}</span>
         {isSelected && (
-          <span style={{ color: 'var(--tg-theme-button-color, #2481cc)', fontWeight: 700, marginLeft: 8, flexShrink: 0 }}>✓</span>
+          <span style={{ color: 'var(--tg-theme-button-color, #10A875)', fontWeight: 700, marginLeft: 8, flexShrink: 0 }}>✓</span>
         )}
       </div>
     );
@@ -137,12 +137,12 @@ export const MedicalHistoryPage: FC = () => {
             flex: 1,
             padding: '10px 4px',
             borderRadius: 10,
-            border: '1.5px solid var(--tg-theme-button-color, #2481cc)',
+            border: '1.5px solid #10A875',
             fontSize: 13,
             fontWeight: 500,
             cursor: 'pointer',
-            background: selected === opt ? 'var(--tg-theme-button-color, #2481cc)' : 'transparent',
-            color: selected === opt ? 'var(--tg-theme-button-text-color, #fff)' : 'var(--tg-theme-button-color, #2481cc)',
+            background: selected === opt ? 'var(--tg-theme-button-color, #10A875)' : 'transparent',
+            color: selected === opt ? 'var(--tg-theme-button-text-color, #fff)' : 'var(--tg-theme-button-color, #10A875)',
             transition: 'background 0.15s',
           }}
         >

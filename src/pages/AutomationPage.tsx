@@ -54,7 +54,7 @@ export const AutomationPage: FC = () => {
                   minWidth: 28,
                   height: 28,
                   borderRadius: 14,
-                  background: 'var(--tg-theme-button-color, #2481cc)',
+                  background: 'var(--tg-theme-button-color, #10A875)',
                   color: 'var(--tg-theme-button-text-color, #fff)',
                   display: 'flex',
                   alignItems: 'center',
