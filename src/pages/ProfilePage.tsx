@@ -6,8 +6,7 @@ import { Page } from '@/components/Page.tsx';
 import { useUserId } from '../hooks/useUserId';
 import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 import { primaryButtonStyle } from '../styles/buttons';
-
-const BASE_URL = 'https://telegram-doctor-bot.onrender.com/api/profile';
+import { getProfile, saveProfile } from '../api/profile';
 
 function toDateInputValue(raw: string | null | undefined): string {
   if (!raw) return '';
@@ -49,11 +48,7 @@ export const ProfilePage: FC = () => {
   useEffect(() => {
     if (!userId) return;
     setLoading(true);
-    fetch(`${BASE_URL}/${userId}`)
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      })
+    getProfile(userId)
       .then((data) => {
         if (data.exists && data.profile) {
           const p = data.profile;
@@ -81,19 +76,14 @@ export const ProfilePage: FC = () => {
     setSaving(true);
     setError('');
     try {
-      const res = await fetch(`${BASE_URL}/${userId ?? 0}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          full_name: fullName || null,
-          birthdate: birthdate || null,
-          gender: gender || null,
-          height: height ? Number(height) : null,
-          weight: weight ? Number(weight) : null,
-          phone: phone || null,
-        }),
+      await saveProfile(userId ?? 0, {
+        full_name: fullName || null,
+        birthdate: birthdate || null,
+        gender: gender || null,
+        height: height ? Number(height) : null,
+        weight: weight ? Number(weight) : null,
+        phone: phone || null,
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setProfileExists(true);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);

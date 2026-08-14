@@ -28,7 +28,6 @@ export const SymptomsPage: FC = () => {
   const handleNext = async () => {
     setLoading(true);
     setError('');
-    console.log('POST /api/consultation/start', { user_id: userId, symptoms });
     try {
       const data = await startConsultation(userId ?? 0, symptoms);
       saveSymptoms(symptoms);

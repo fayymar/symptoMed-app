@@ -5,6 +5,7 @@ import { Button, Textarea } from '@telegram-apps/telegram-ui';
 import { Page } from '@/components/Page.tsx';
 import { useUserId } from '../hooks/useUserId';
 import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
+import { saveProfile } from '../api/profile';
 
 const CHRONIC_DISEASES = [
   '🩺 Гипертония (высокое давление)',
@@ -62,17 +63,13 @@ export const MedicalHistoryPage: FC = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await fetch(`https://telegram-doctor-bot.onrender.com/api/profile/${userId ?? 0}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chronic_diseases: Array.from(chronic),
-          hereditary: Array.from(hereditary),
-          allergies: Array.from(allergies),
-          allergies_other: allergiesOther || null,
-          smoking: smoking || null,
-          physical_activity: activity || null,
-        }),
+      await saveProfile(userId ?? 0, {
+        chronic_diseases: Array.from(chronic),
+        hereditary: Array.from(hereditary),
+        allergies: Array.from(allergies),
+        allergies_other: allergiesOther || null,
+        smoking: smoking || null,
+        physical_activity: activity || null,
       });
       setSaved(true);
       setTimeout(() => navigate('/profile'), 1500);

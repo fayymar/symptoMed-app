@@ -5,6 +5,7 @@ import { Section, Cell, List } from '@telegram-apps/telegram-ui';
 import { Page } from '@/components/Page.tsx';
 import { useUserId } from '../hooks/useUserId';
 import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
+import { getHealthMetrics } from '../api/health';
 
 interface MetricRecord {
   value: number;
@@ -108,13 +109,8 @@ export const MetricHistoryPage: FC = () => {
       setLoading(false);
       return;
     }
-    fetch(`https://telegram-doctor-bot.onrender.com/api/health/metrics/${userId}?type=${config.apiType}&limit=20`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
+    getHealthMetrics(userId, config.apiType, 20)
       .then((data) => {
-        console.log(data);
         setRecords(data.records ?? []);
       })
       .catch(() => setError('Не удалось загрузить данные'))

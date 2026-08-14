@@ -28,7 +28,6 @@ export const QuestionsPage: FC = () => {
 
   const current = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
-  console.log('current question:', current);
 
   const toggleOption = (option: string) => {
     setSelectedOptions((prev) => {

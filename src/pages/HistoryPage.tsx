@@ -4,13 +4,9 @@ import { Page } from '@/components/Page.tsx';
 import { useUserId } from '../hooks/useUserId';
 import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 import { primaryButtonStyle } from '../styles/buttons';
+import { getConsultations, type ConsultationRecord } from '../api/profile';
 
-interface Consultation {
-  id: string;
-  created_at: string;
-  symptoms: string;
-  recommended_doctor?: string;
-}
+interface Consultation extends ConsultationRecord {}
 
 function formatDate(utcString: string): string {
   const date = new Date(utcString.endsWith('Z') ? utcString : utcString + 'Z');
@@ -29,11 +25,7 @@ export const HistoryPage: FC = () => {
     if (!userId) return;
     setLoading(true);
     setError('');
-    fetch(`https://telegram-doctor-bot.onrender.com/api/consultations/${userId}`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
+    getConsultations(userId)
       .then((data) => {
         setConsultations(data.records ?? []);
       })

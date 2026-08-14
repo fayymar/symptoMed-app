@@ -6,6 +6,7 @@ import { Page } from '@/components/Page.tsx';
 import { useUserId } from '../hooks/useUserId';
 import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 import { primaryButtonStyle } from '../styles/buttons';
+import { getHealthMetricsReport } from '../api/health';
 
 type SendStatus = 'idle' | 'waiting' | 'success' | 'error';
 
@@ -58,12 +59,8 @@ export const HealthPage: FC = () => {
     setSendStatus('waiting');
 
     setTimeout(() => {
-      fetch(`https://telegram-doctor-bot.onrender.com/api/health/metrics/report/${userId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      })
-        .then((res) => {
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      getHealthMetricsReport(userId)
+        .then(() => {
           setSendStatus('success');
         })
         .catch(() => setSendStatus('error'));

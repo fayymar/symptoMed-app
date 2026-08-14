@@ -5,6 +5,7 @@ import { Button } from '@telegram-apps/telegram-ui';
 import { Page } from '@/components/Page.tsx';
 import { useUserId } from '../hooks/useUserId';
 import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
+import { saveProfile } from '../api/profile';
 
 const METRICS = [
   { id: 'heartrate', icon: '❤️', name: 'Пульс', sub: 'Apple Watch или другие умные часы' },
@@ -34,11 +35,7 @@ export const MetricsSetupPage: FC = () => {
     localStorage.setItem('symptomed_metrics_setup_done', 'true');
     if (userId) {
       try {
-        await fetch(`https://telegram-doctor-bot.onrender.com/api/profile/${userId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ available_metrics: metrics }),
-        });
+        await saveProfile(userId, { available_metrics: metrics });
       } catch {}
     }
     navigate('/pulse-setup');

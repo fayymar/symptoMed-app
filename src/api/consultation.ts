@@ -1,4 +1,4 @@
-const BASE_URL = 'https://telegram-doctor-bot.onrender.com/api/consultation';
+import { apiFetch, jsonHeaders } from './client';
 
 export interface Question {
   text: string;
@@ -34,13 +34,11 @@ export async function startConsultation(
   userId: number,
   symptoms: string,
 ): Promise<StartResponse> {
-  const response = await fetch(`${BASE_URL}/start`, {
+  return apiFetch('/api/consultation/start', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: jsonHeaders(),
     body: JSON.stringify({ user_id: userId, symptoms }),
   });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  return response.json();
 }
 
 export async function sendAnswers(
@@ -48,45 +46,38 @@ export async function sendAnswers(
   userId: number,
   answers: string[],
 ): Promise<void> {
-  // Fix: send plain string array, not objects
-  const response = await fetch(`${BASE_URL}/answer`, {
+  await apiFetch('/api/consultation/answer', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: jsonHeaders(),
     body: JSON.stringify({
       session_id: sessionId,
       user_id: userId,
-      answers: answers, // plain strings, not objects
+      answers, // plain strings, not objects
     }),
   });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
 }
 
 export async function sendDuration(
   sessionId: string,
   duration: string,
 ): Promise<DurationResponse> {
-  const response = await fetch(`${BASE_URL}/duration`, {
+  return apiFetch('/api/consultation/duration', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: jsonHeaders(),
     body: JSON.stringify({ session_id: sessionId, duration }),
   });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  return response.json();
 }
 
 export async function getResult(
   sessionId: string,
   anamnesisAnswers?: string[],
 ): Promise<ResultResponse> {
-  // Fix: send anamnesis_answers so backend can use them in AI prompt
-  const response = await fetch(`${BASE_URL}/result`, {
+  return apiFetch('/api/consultation/result', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: jsonHeaders(),
     body: JSON.stringify({
       session_id: sessionId,
       anamnesis_answers: anamnesisAnswers ?? [],
     }),
   });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  return response.json();
 }

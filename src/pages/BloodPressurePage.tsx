@@ -4,6 +4,7 @@ import { Section, Cell, List } from '@telegram-apps/telegram-ui';
 import { Page } from '@/components/Page.tsx';
 import { useUserId } from '../hooks/useUserId';
 import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
+import { getHealthMetrics } from '../api/health';
 
 interface BPRecord {
   value: number;
@@ -74,14 +75,11 @@ export const BloodPressurePage: FC = () => {
       return;
     }
 
-    const base = `https://telegram-doctor-bot.onrender.com/api/health/metrics/${userId}`;
     Promise.all([
-      fetch(`${base}?type=blood_pressure_systolic&limit=20`).then((r) => r.json()),
-      fetch(`${base}?type=blood_pressure_diastolic&limit=20`).then((r) => r.json()),
+      getHealthMetrics(userId, 'blood_pressure_systolic', 20),
+      getHealthMetrics(userId, 'blood_pressure_diastolic', 20),
     ])
       .then(([sysData, diaData]) => {
-        console.log('systolic:', sysData);
-        console.log('diastolic:', diaData);
         const merged = mergeRecords(sysData.records ?? [], diaData.records ?? []);
         setMeasurements(merged);
       })

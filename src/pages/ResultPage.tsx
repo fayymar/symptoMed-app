@@ -1,4 +1,4 @@
-import { type FC, useEffect } from 'react';
+import { type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Section, Cell, List } from '@telegram-apps/telegram-ui';
 
@@ -30,10 +30,6 @@ export const ResultPage: FC = () => {
   const { result, reset } = useConsultation();
 
   const userId = useUserId();
-
-  useEffect(() => {
-    if (result) console.log('result:', result);
-  }, [result]);
 
   const handleNewConsultation = () => {
     reset();

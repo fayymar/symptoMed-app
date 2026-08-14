@@ -2,6 +2,7 @@ import { useState, useEffect, type FC } from 'react';
 import { Section, Cell, List } from '@telegram-apps/telegram-ui';
 
 import { Page } from '@/components/Page.tsx';
+import { getHeartrate } from '../api/health';
 
 interface HeartrateRecord {
   value: number;
@@ -55,13 +56,8 @@ export const HeartratePage: FC = () => {
       setLoading(false);
       return;
     }
-    fetch(`https://telegram-doctor-bot.onrender.com/api/health/heartrate/${userId}`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
+    getHeartrate(userId)
       .then((data: HeartrateResponse) => {
-        console.log(data);
         setRecords(data.records ?? []);
       })
       .catch(() => setError('Не удалось загрузить историю пульса'))
