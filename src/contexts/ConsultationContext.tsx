@@ -16,13 +16,13 @@ interface ConsultationState {
   duration: string;
   anamnesisQuestions: Question[];
   anamnesisAnswers: string[];
-  redFlag: { text: string } | null;
+  redFlag: boolean;
   needsFreshMetrics: string[];
   result: ResultData | null;
 }
 
 interface ConsultationContextValue extends ConsultationState {
-  setSessionData: (sessionId: string, questions: Question[], redFlag: { text: string } | null, needsFreshMetrics: string[]) => void;
+  setSessionData: (sessionId: string, questions: Question[], redFlag: boolean, needsFreshMetrics: string[]) => void;
   setSymptoms: (symptoms: string) => void;
   setAnswer: (index: number, answer: string) => void;
   setDuration: (duration: string) => void;
@@ -40,7 +40,7 @@ const defaultState: ConsultationState = {
   duration: '',
   anamnesisQuestions: [],
   anamnesisAnswers: [],
-  redFlag: null,
+  redFlag: false,
   needsFreshMetrics: [],
   result: null,
 };
@@ -53,7 +53,7 @@ export const ConsultationProvider: FC<{ children: ReactNode }> = ({ children }) 
   const setSessionData = (
     sessionId: string,
     questions: Question[],
-    redFlag: { text: string } | null,
+    redFlag: boolean,
     needsFreshMetrics: string[],
   ) => setState((s) => ({ ...s, sessionId, questions, answers: [], redFlag, needsFreshMetrics }));
 

@@ -34,12 +34,12 @@ export const SymptomsPage: FC = () => {
       setSessionData(
         data.session_id,
         data.questions ?? [],
-        data.red_flag ?? null,
+        data.red_flag ?? false,
         data.needs_fresh_metrics ?? [],
       );
 
-      if (data.red_flag?.text) {
-        alert(`🚨 Срочно обратитесь к врачу\n\n${data.red_flag.text}`);
+      if (data.red_flag) {
+        alert('🚨 Возможны признаки состояния, требующего срочной консультации врача. Пожалуйста, обратитесь к специалисту как можно скорее.');
       }
 
       if (data.needs_fresh_metrics && data.needs_fresh_metrics.length > 0) {
@@ -48,8 +48,10 @@ export const SymptomsPage: FC = () => {
       } else {
         navigate('/questions');
       }
-    } catch (err) {
-      const msg = 'Ошибка соединения. Попробуйте ещё раз.';
+    } catch (err: any) {
+      const msg = err?.message && err.message !== 'HTTP 422'
+        ? err.message
+        : 'Ошибка соединения. Попробуйте ещё раз.';
       console.error('startConsultation error:', err);
       alert(msg);
       setError(msg);

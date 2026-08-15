@@ -10,7 +10,7 @@ export async function apiFetch<T = any>(path: string, options?: RequestInit): Pr
     let msg = `HTTP ${res.status}`;
     try {
       const j = await res.json();
-      msg = j.error || msg;
+      msg = j.message || j.error || msg;
     } catch {
       // response wasn't JSON — keep the generic HTTP status message
     }

@@ -1,4 +1,4 @@
-import { useState, type FC } from 'react';
+import { useState, useEffect, type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Textarea } from '@telegram-apps/telegram-ui';
 
@@ -21,8 +21,13 @@ export const QuestionsPage: FC = () => {
 
   const userId = useUserId();
 
+  useEffect(() => {
+    if (questions.length === 0) {
+      navigate('/');
+    }
+  }, [questions.length, navigate]);
+
   if (questions.length === 0) {
-    navigate('/');
     return null;
   }
 

@@ -15,7 +15,7 @@ export interface Specialist {
 export interface StartResponse {
   session_id: string;
   questions: Question[];
-  red_flag?: { text: string } | null;
+  red_flag?: boolean;
   needs_fresh_metrics?: string[];
 }
 
