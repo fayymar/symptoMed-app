@@ -59,9 +59,11 @@ export const MedicalHistoryPage: FC = () => {
   const [activity, setActivity] = useState('');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSave = async () => {
     setSaving(true);
+    setError('');
     try {
       await saveProfile(userId ?? 0, {
         chronic_diseases: Array.from(chronic),
@@ -73,7 +75,9 @@ export const MedicalHistoryPage: FC = () => {
       });
       setSaved(true);
       setTimeout(() => navigate('/profile'), 1500);
-    } catch {}
+    } catch {
+      setError('Не удалось сохранить. Проверьте соединение и попробуйте ещё раз.');
+    }
     finally {
       setSaving(false);
     }
@@ -270,12 +274,18 @@ export const MedicalHistoryPage: FC = () => {
 
             <div style={{ flex: 1 }} />
 
+            {error && (
+              <div style={{ fontSize: 14, color: '#ec3942', textAlign: 'center', padding: '8px 0' }}>
+                {error}
+              </div>
+            )}
+
             {saved ? (
               <div style={{ fontSize: 16, fontWeight: 600, color: '#34C759', textAlign: 'center', padding: '16px 0' }}>
                 ✅ Сохранено
               </div>
             ) : (
-              <Button size="l" stretched disabled={saving} onClick={handleSave}>
+              <Button size="l" stretched disabled={saving} onClick={() => void handleSave()}>
                 {saving ? 'Сохранение...' : 'Сохранить'}
               </Button>
             )}

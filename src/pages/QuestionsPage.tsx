@@ -115,7 +115,10 @@ export const QuestionsPage: FC = () => {
           marginBottom: 16,
           lineHeight: 1.4,
         }}>
-          {(current as any).text || (current as any).question || (current as any).content || JSON.stringify(current)}
+          {(() => {
+            const q = current as { text?: string; question?: string; content?: string };
+            return q.text || q.question || q.content || JSON.stringify(current);
+          })()}
         </div>
         <div style={{ fontSize: 13, color: 'var(--tg-theme-hint-color, #999)', marginBottom: 16 }}>
           Можно выбрать несколько вариантов
@@ -171,7 +174,7 @@ export const QuestionsPage: FC = () => {
             size="l"
             stretched
             disabled={!canProceed || loading}
-            onClick={handleNext}
+            onClick={() => void handleNext()}
           >
             {loading ? 'Загрузка...' : 'Далее'}
           </Button>

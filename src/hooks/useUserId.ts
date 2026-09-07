@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
+import type { TelegramWebAppUser } from '@/types/telegram-webapp';
 
 export const useUserId = () => {
   const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
     const tryGetUserId = (): boolean => {
-      const tg = (window as any).Telegram?.WebApp;
+      const tg = window.Telegram?.WebApp;
 
       // Способ 1: Telegram WebApp initDataUnsafe
       if (tg) {
@@ -30,7 +31,7 @@ export const useUserId = () => {
             const params = new URLSearchParams(initData);
             const userStr = params.get('user');
             if (userStr) {
-              const user = JSON.parse(decodeURIComponent(userStr));
+              const user = JSON.parse(decodeURIComponent(userStr)) as TelegramWebAppUser;
               if (user?.id) {
                 const id = Number(user.id);
                 const prev = localStorage.getItem('symptomed_user_id');

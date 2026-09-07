@@ -45,7 +45,7 @@ export async function init(options: {
             firstThemeSent = true;
             tp = tp || (retrieveLaunchParams().tgWebAppThemeParams as unknown as ThemeParams);
           }
-          return emitEvent('theme_changed', { theme_params: tp as any });
+          return emitEvent('theme_changed', { theme_params: tp as unknown as Record<string, `#${string}` | undefined> });
         }
 
         if (event.name === 'web_app_request_safe_area') {
@@ -68,8 +68,7 @@ export async function init(options: {
   }
 
   if (viewport.mount.isAvailable()) {
-    viewport.mount().then(() => {
-      viewport.bindCssVars();
-    });
+    await viewport.mount();
+    viewport.bindCssVars();
   }
 }

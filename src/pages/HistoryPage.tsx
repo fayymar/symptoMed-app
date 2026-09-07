@@ -6,7 +6,7 @@ import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 import { primaryButtonStyle } from '../styles/buttons';
 import { getConsultations, type ConsultationRecord } from '../api/profile';
 
-interface Consultation extends ConsultationRecord {}
+type Consultation = ConsultationRecord;
 
 function formatDate(utcString: string): string {
   const date = new Date(utcString.endsWith('Z') ? utcString : utcString + 'Z');

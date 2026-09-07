@@ -1,4 +1,4 @@
-import { type FC, useMemo } from 'react';
+import { type FC, type ReactNode, useMemo } from 'react';
 import {
   initData,
   type User,
@@ -9,8 +9,24 @@ import { List, Placeholder } from '@telegram-apps/telegram-ui';
 import { DisplayData, type DisplayDataRow } from '@/components/DisplayData/DisplayData.tsx';
 import { Page } from '@/components/Page.tsx';
 
+// Значения полей User/InitDataState приходят из SDK типизированными слабо (местами `any`),
+// а эта страница — чисто отладочный дамп произвольных полей, так что безопасно приводим
+// любое значение к тому, что React реально может отрендерить.
+function toDisplayValue(value: unknown): ReactNode {
+  if (value === null || value === undefined) return value;
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return value;
+  }
+  if (value instanceof Date) return value.toISOString();
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return '[unserializable value]';
+  }
+}
+
 function getUserRows(user: User): DisplayDataRow[] {
-  return Object.entries(user).map(([title, value]) => ({ title, value }));
+  return Object.entries(user).map(([title, value]) => ({ title, value: toDisplayValue(value) }));
 }
 
 export const InitDataPage: FC = () => {
@@ -27,7 +43,7 @@ export const InitDataPage: FC = () => {
         if (value instanceof Date) {
           acc.push({ title, value: value.toISOString() });
         } else if (!value || typeof value !== 'object') {
-          acc.push({ title, value });
+          acc.push({ title, value: toDisplayValue(value) });
         }
         return acc;
       }, []),
@@ -49,7 +65,7 @@ export const InitDataPage: FC = () => {
   const chatRows = useMemo<DisplayDataRow[] | undefined>(() => {
     return !initDataState?.chat
       ? undefined
-      : Object.entries(initDataState.chat).map(([title, value]) => ({ title, value }));
+      : Object.entries(initDataState.chat).map(([title, value]) => ({ title, value: toDisplayValue(value) }));
   }, [initDataState]);
 
   if (!initDataRows) {

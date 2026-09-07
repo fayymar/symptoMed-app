@@ -41,14 +41,22 @@ const METRIC_CARDS: MetricCard[] = [
 export const HealthPage: FC = () => {
   useTelegramBackButton();
   const navigate = useNavigate();
-  const platform = (window as any).Telegram?.WebApp?.platform;
+  const platform = window.Telegram?.WebApp?.platform;
   const isIOS = platform === 'ios';
   const [sendStatus, setSendStatus] = useState<SendStatus>('idle');
   const userId = useUserId();
 
-  const metrics: string[] = JSON.parse(
-    localStorage.getItem('symptomed_metrics') || '["heartrate","blood_pressure","spo2","steps"]'
-  );
+  const metrics: string[] = (() => {
+    try {
+      const parsed: unknown = JSON.parse(localStorage.getItem('symptomed_metrics') || '[]');
+      if (Array.isArray(parsed) && parsed.every((m) => typeof m === 'string') && parsed.length > 0) {
+        return parsed;
+      }
+    } catch {
+      // повреждённые данные — используем дефолт ниже
+    }
+    return ['heartrate', 'blood_pressure', 'spo2', 'steps'];
+  })();
 
   const handleSendMetrics = () => {
     if (!userId) {

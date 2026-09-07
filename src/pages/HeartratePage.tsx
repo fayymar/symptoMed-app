@@ -44,7 +44,7 @@ function formatDate(dateStr: string): string {
 }
 
 export const HeartratePage: FC = () => {
-  const userId = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
+  const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
 
   const [records, setRecords] = useState<HeartrateRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,8 +57,9 @@ export const HeartratePage: FC = () => {
       return;
     }
     getHeartrate(userId)
-      .then((data: HeartrateResponse) => {
-        setRecords(data.records ?? []);
+      .then((data) => {
+        const { records } = data as HeartrateResponse;
+        setRecords(records ?? []);
       })
       .catch(() => setError('Не удалось загрузить историю пульса'))
       .finally(() => setLoading(false));

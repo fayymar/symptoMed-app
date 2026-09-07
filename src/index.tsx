@@ -34,7 +34,7 @@ try {
         </StrictMode>,
       );
     });
-} catch (e) {
+} catch {
   // SDK init failed (not in Telegram or outdated client).
   // App.tsx has its own SDKErrorBoundary and will render without SDK.
   root.render(

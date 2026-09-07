@@ -111,7 +111,8 @@ export const MetricHistoryPage: FC = () => {
     }
     getHealthMetrics(userId, config.apiType, 20)
       .then((data) => {
-        setRecords(data.records ?? []);
+        const { records } = data as { records?: MetricRecord[] };
+        setRecords(records ?? []);
       })
       .catch(() => setError('Не удалось загрузить данные'))
       .finally(() => setLoading(false));

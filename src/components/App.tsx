@@ -8,7 +8,7 @@ import { ConsultationProvider } from '@/contexts/ConsultationContext.tsx';
 
 function AppRouter() {
   useEffect(() => {
-    const tg = (window as any).Telegram?.WebApp;
+    const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.ready();
       tg.expand();

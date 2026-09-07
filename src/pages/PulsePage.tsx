@@ -6,11 +6,11 @@ import { Page } from '@/components/Page.tsx';
 
 export const PulsePage: FC = () => {
   const navigate = useNavigate();
-  const platform = (window as any).Telegram?.WebApp?.platform;
+  const platform = window.Telegram?.WebApp?.platform;
   const isIOS = platform === 'ios';
 
   const handleSendPulse = () => {
-    const userId = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
+    const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
     if (!userId) {
       alert('Откройте приложение через бота');
       return;

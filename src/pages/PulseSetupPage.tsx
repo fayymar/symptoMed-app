@@ -41,8 +41,13 @@ export const PulseSetupPage: FC = () => {
     const stored = localStorage.getItem('symptomed_metrics');
     if (stored) {
       try {
-        setMetrics(JSON.parse(stored));
-      } catch {}
+        const parsed: unknown = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          setMetrics(parsed.filter((m): m is string => typeof m === 'string'));
+        }
+      } catch {
+        // повреждённые данные в localStorage — просто игнорируем, останется дефолт
+      }
     }
   }, []);
 
@@ -53,6 +58,8 @@ export const PulseSetupPage: FC = () => {
     navigator.clipboard.writeText(String(userId)).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 3000);
+    }).catch(() => {
+      // clipboard write can be denied by the browser — silently ignore, UI just won't show "copied"
     });
   };
 
