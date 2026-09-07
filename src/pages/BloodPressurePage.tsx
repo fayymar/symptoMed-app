@@ -80,7 +80,9 @@ export const BloodPressurePage: FC = () => {
       getHealthMetrics(userId, 'blood_pressure_diastolic', 20),
     ])
       .then(([sysData, diaData]) => {
-        const merged = mergeRecords(sysData.records ?? [], diaData.records ?? []);
+        const sys = sysData as { records?: BPRecord[] };
+        const dia = diaData as { records?: BPRecord[] };
+        const merged = mergeRecords(sys.records ?? [], dia.records ?? []);
         setMeasurements(merged);
       })
       .catch(() => setError('Не удалось загрузить данные'))

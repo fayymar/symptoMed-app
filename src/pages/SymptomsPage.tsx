@@ -48,9 +48,10 @@ export const SymptomsPage: FC = () => {
       } else {
         navigate('/questions');
       }
-    } catch (err: any) {
-      const msg = err?.message && err.message !== 'HTTP 422'
-        ? err.message
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : undefined;
+      const msg = message && message !== 'HTTP 422'
+        ? message
         : 'Ошибка соединения. Попробуйте ещё раз.';
       console.error('startConsultation error:', err);
       alert(msg);
@@ -134,7 +135,7 @@ export const SymptomsPage: FC = () => {
               size="l"
               stretched
               disabled={symptoms.trim().length === 0 || loading}
-              onClick={handleNext}
+              onClick={() => void handleNext()}
             >
               {loading ? 'Загрузка...' : 'Далее'}
             </Button>

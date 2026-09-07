@@ -2,7 +2,7 @@ import { emitEvent, mockTelegramEnv } from '@tma.js/sdk-react';
 
 function isInTelegram(): boolean {
   try {
-    if ((window as any).Telegram?.WebApp?.initData) return true;
+    if (window.Telegram?.WebApp?.initData) return true;
     const hash = window.location.hash.slice(1);
     const params = new URLSearchParams(hash);
     if (params.has('tgWebAppData') || params.has('tgWebAppVersion')) return true;

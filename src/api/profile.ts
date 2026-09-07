@@ -1,15 +1,32 @@
 import { apiFetch, jsonHeaders } from './client';
 
+export interface Profile {
+  full_name?: string;
+  phone?: string;
+  birthdate?: string;
+  gender?: string;
+  height?: number;
+  weight?: number;
+  chronic_diseases?: string[];
+  hereditary?: string[];
+  allergies?: string[];
+  allergies_other?: string;
+  drug_allergies?: string;
+  smoking?: string;
+  physical_activity?: string;
+  current_medications?: string;
+}
+
 export interface ProfileResponse {
   exists: boolean;
-  profile?: Record<string, any>;
+  profile?: Profile;
 }
 
 export function getProfile(userId: number): Promise<ProfileResponse> {
   return apiFetch(`/api/profile/${userId}`);
 }
 
-export function saveProfile(userId: number, data: object): Promise<any> {
+export function saveProfile(userId: number, data: object): Promise<{ ok: boolean }> {
   return apiFetch(`/api/profile/${userId}`, {
     method: 'POST',
     headers: jsonHeaders(),

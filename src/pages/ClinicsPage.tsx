@@ -69,9 +69,9 @@ export const ClinicsPage: FC = () => {
 
   const requestLocation = () => {
     setLocationDenied(false);
-    const tg = (window as any).Telegram?.WebApp;
+    const tg = window.Telegram?.WebApp;
     if (tg && tg.requestLocation) {
-      tg.requestLocation((locationData: any) => {
+      tg.requestLocation((locationData) => {
         if (locationData) {
           setUserLocation({ lat: locationData.latitude, lng: locationData.longitude });
         } else {

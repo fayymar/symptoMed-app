@@ -168,7 +168,7 @@ export const DurationPage: FC = () => {
               stretched
               mode="outline"
               disabled={loading}
-              onClick={() => handleDuration(duration)}
+              onClick={() => void handleDuration(duration)}
             >
               {loading ? 'Загрузка...' : duration}
             </Button>

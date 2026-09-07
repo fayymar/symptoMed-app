@@ -266,7 +266,7 @@ export const ProfilePage: FC = () => {
           </div>
         )}
 
-        <button style={primaryButtonStyle} disabled={saving} onClick={handleSave}>
+        <button style={primaryButtonStyle} disabled={saving} onClick={() => void handleSave()}>
           {saved ? '✅ Сохранено' : saving ? 'Сохранение...' : '💾 Сохранить'}
         </button>
 

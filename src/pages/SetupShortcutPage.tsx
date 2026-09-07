@@ -18,7 +18,7 @@ const STEPS = [
 
 export const SetupShortcutPage: FC = () => {
   const navigate = useNavigate();
-  const userId = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
+  const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -26,6 +26,8 @@ export const SetupShortcutPage: FC = () => {
     navigator.clipboard.writeText(String(userId)).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    }).catch(() => {
+      // clipboard write can be denied by the browser — silently ignore, UI just won't show "copied"
     });
   };
 

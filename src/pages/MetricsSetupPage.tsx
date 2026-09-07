@@ -36,7 +36,11 @@ export const MetricsSetupPage: FC = () => {
     if (userId) {
       try {
         await saveProfile(userId, { available_metrics: metrics });
-      } catch {}
+      } catch (e) {
+        // не блокируем переход дальше — метрики уже сохранены в localStorage,
+        // это лишь попытка синхронизировать их с профилем на сервере
+        console.error('Failed to sync available_metrics to profile:', e);
+      }
     }
     navigate('/pulse-setup');
   };
@@ -116,7 +120,7 @@ export const MetricsSetupPage: FC = () => {
           })}
         </div>
 
-        <Button size="l" stretched disabled={selected.size === 0} onClick={handleContinue}>
+        <Button size="l" stretched disabled={selected.size === 0} onClick={() => void handleContinue()}>
           Продолжить
         </Button>
 
