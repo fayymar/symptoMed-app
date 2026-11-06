@@ -29,7 +29,7 @@ export const SymptomsPage: FC = () => {
     setLoading(true);
     setError('');
     try {
-      const data = await startConsultation(userId ?? 0, symptoms);
+      const data = await startConsultation(symptoms);
       saveSymptoms(symptoms);
       setSessionData(
         data.session_id,
