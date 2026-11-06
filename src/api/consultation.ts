@@ -24,34 +24,28 @@ export interface DurationResponse {
 }
 
 export interface ResultResponse {
+  consultation_id?: number | null;
   urgency: string;
   recommendation: string;
   specialists: Specialist[];
   needs_fresh_metrics?: string[];
 }
 
-export async function startConsultation(
-  userId: number,
-  symptoms: string,
-): Promise<StartResponse> {
+// Пользователь определяется бэкендом по токену (см. client.ts), user_id не передаём
+export async function startConsultation(symptoms: string): Promise<StartResponse> {
   return apiFetch('/api/consultation/start', {
     method: 'POST',
     headers: jsonHeaders(),
-    body: JSON.stringify({ user_id: userId, symptoms }),
+    body: JSON.stringify({ symptoms }),
   });
 }
 
-export async function sendAnswers(
-  sessionId: string,
-  userId: number,
-  answers: string[],
-): Promise<void> {
+export async function sendAnswers(sessionId: string, answers: string[]): Promise<void> {
   await apiFetch('/api/consultation/answer', {
     method: 'POST',
     headers: jsonHeaders(),
     body: JSON.stringify({
       session_id: sessionId,
-      user_id: userId,
       answers, // plain strings, not objects
     }),
   });

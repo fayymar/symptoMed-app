@@ -8,8 +8,9 @@ export function getHealthMetrics(userId: number, type?: string, limit?: number):
   return apiFetch(`/api/health/metrics/${userId}${qs ? `?${qs}` : ''}`);
 }
 
-export function postHealthMetric(userId: number, data: object): Promise<{ ok: boolean }> {
-  return apiFetch(`/api/health/metrics/${userId}`, {
+// Пользователь определяется по токену; userId оставлен для совместимости вызовов
+export function postHealthMetric(_userId: number, data: object): Promise<{ ok: boolean }> {
+  return apiFetch('/api/health/metrics', {
     method: 'POST',
     headers: jsonHeaders(),
     body: JSON.stringify(data),

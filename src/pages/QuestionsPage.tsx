@@ -5,7 +5,6 @@ import { Button, Textarea } from '@telegram-apps/telegram-ui';
 import { Page } from '@/components/Page.tsx';
 import { sendAnswers } from '@/api/consultation.ts';
 import { useConsultation } from '@/contexts/ConsultationContext.tsx';
-import { useUserId } from '../hooks/useUserId';
 import { useTelegramBackButton } from '../hooks/useTelegramBackButton';
 
 export const QuestionsPage: FC = () => {
@@ -19,7 +18,6 @@ export const QuestionsPage: FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const userId = useUserId();
 
   useEffect(() => {
     if (questions.length === 0) {
@@ -62,7 +60,7 @@ export const QuestionsPage: FC = () => {
       const finalAnswers = [...answers];
       finalAnswers[currentIndex] = answerValue;
       try {
-        await sendAnswers(sessionId, userId ?? 0, finalAnswers);
+        await sendAnswers(sessionId, finalAnswers);
       } catch {
         setError('Ошибка соединения. Попробуйте ещё раз.');
         setLoading(false);
