@@ -32,6 +32,8 @@ export interface TelegramWebApp {
   };
   BackButton: TelegramWebAppBackButton;
   requestLocation?(callback: (location: TelegramWebAppLocationData | null) => void): void;
+  openLink?(url: string): void;
+  close?(): void;
 }
 
 declare global {

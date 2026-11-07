@@ -47,6 +47,14 @@ async function getToken(forceRefresh = false): Promise<string | null> {
   return tokenPromise;
 }
 
+/** Есть ли сессия пользователя (открыто из Telegram и вход по initData удался). Без неё — гостевой режим. */
+export async function hasSession(): Promise<boolean> {
+  return (await getToken()) !== null;
+}
+
+/** Событие, по которому показывается окно согласия (бэкенд ответил 403 consent_required). */
+export const CONSENT_REQUIRED_EVENT = 'symed:consent-required';
+
 async function doFetch(path: string, options: RequestInit | undefined, token: string | null) {
   const headers = new Headers(options?.headers);
   if (token) headers.set('Authorization', `Bearer ${token}`);
@@ -72,6 +80,10 @@ export async function apiFetch<T = unknown>(path: string, options?: RequestInit)
       msg = j.message || j.error || msg;
     } catch {
       // response wasn't JSON — keep the generic HTTP status message
+    }
+    if (res.status === 403 && msg === 'consent_required') {
+      window.dispatchEvent(new Event(CONSENT_REQUIRED_EVENT));
+      msg = 'Нужно согласие на обработку данных';
     }
     throw new Error(msg);
   }

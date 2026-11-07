@@ -5,6 +5,7 @@ import { AppRoot } from '@telegram-apps/telegram-ui';
 
 import { routes } from '@/navigation/routes.tsx';
 import { ConsultationProvider } from '@/contexts/ConsultationContext.tsx';
+import { ConsentGate } from '@/components/ConsentGate.tsx';
 
 function AppRouter() {
   useEffect(() => {
@@ -23,6 +24,7 @@ function AppRouter() {
           <Route path="*" element={<Navigate to="/"/>}/>
         </Routes>
       </HashRouter>
+      <ConsentGate />
     </ConsultationProvider>
   );
 }
