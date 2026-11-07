@@ -1,4 +1,5 @@
 import { apiFetch, jsonHeaders } from './client';
+import { CONSENT_VERSION, isConsentAcceptedHere } from './consent';
 
 export interface Question {
   text: string;
@@ -31,12 +32,17 @@ export interface ResultResponse {
   needs_fresh_metrics?: string[];
 }
 
-// Пользователь определяется бэкендом по токену (см. client.ts), user_id не передаём
+// Пользователь определяется бэкендом по токену (см. client.ts), user_id не передаём.
+// Гость (без входа) подтверждает согласие в окне — тогда передаём его версию в запросе;
+// у вошедшего пользователя бэкенд проверяет согласие по базе.
 export async function startConsultation(symptoms: string): Promise<StartResponse> {
+  const consent = isConsentAcceptedHere()
+    ? { consent_version: CONSENT_VERSION, consent_source: 'miniapp' }
+    : {};
   return apiFetch('/api/consultation/start', {
     method: 'POST',
     headers: jsonHeaders(),
-    body: JSON.stringify({ symptoms }),
+    body: JSON.stringify({ symptoms, ...consent }),
   });
 }
 
