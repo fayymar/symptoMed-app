@@ -1,24 +1,10 @@
-import { useNavigate } from 'react-router-dom';
-import { backButton } from '@tma.js/sdk-react';
-import { type PropsWithChildren, useEffect } from 'react';
+import type { PropsWithChildren } from 'react';
 
-export function Page({ children, back = true }: PropsWithChildren<{
-  /**
-   * True if it is allowed to go back from this page.
-   */
-  back?: boolean
-}>) {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (back) {
-      backButton.show();
-      return backButton.onClick(() => {
-        navigate(-1);
-      });
-    }
-    backButton.hide();
-  }, [back]);
-
+/**
+ * Обёртка страницы. Кнопкой «Назад» Telegram управляет хук useTelegramBackButton
+ * на тех страницах, где она нужна. Раньше здесь же вызывался backButton из SDK:
+ * вне Telegram это бросало ошибку и приложение уходило в бесконечную перерисовку.
+ */
+export function Page({ children }: PropsWithChildren<{ back?: boolean }>) {
   return <>{children}</>;
 }
