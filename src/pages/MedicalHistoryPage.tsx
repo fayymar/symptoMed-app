@@ -89,6 +89,7 @@ export const MedicalHistoryPage: FC = () => {
   const [smoking, setSmoking] = useState('');
   const [activity, setActivity] = useState('');
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
@@ -113,16 +114,24 @@ export const MedicalHistoryPage: FC = () => {
         setSmoking(LEGACY_CODES[p.smoking || ''] || p.smoking || '');
         setActivity(LEGACY_CODES[p.physical_activity || ''] || p.physical_activity || '');
       })
-      .catch(() => setError('Не удалось загрузить сохранённые данные. Проверьте соединение.'))
+      .catch(() => {
+        setLoadFailed(true);
+        setError('Не удалось загрузить сохранённые данные. Проверьте соединение и откройте экран заново.');
+      })
       .finally(() => setLoading(false));
   }, [userId]);
 
   const handleSave = async () => {
+    // Без загруженных данных сохранение пустой формы стёрло бы анамнез
+    if (loadFailed || !userId) {
+      setError('Не удалось загрузить сохранённые данные. Проверьте соединение и откройте экран заново.');
+      return;
+    }
     setSaving(true);
     setError('');
     try {
       const other = allergiesOther.trim();
-      await saveProfile(userId ?? 0, {
+      await saveProfile(userId, {
         chronic_diseases: Array.from(chronic),
         hereditary: Array.from(hereditary),
         drug_allergies: [...Array.from(allergies), ...(other ? [other] : [])].join(', '),
