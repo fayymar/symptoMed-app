@@ -57,10 +57,14 @@ const ACTIVITY: Option[] = [
 ];
 
 // Старые записи из Mini App хранили подписи кнопок вместо кодов
-const LEGACY_CODES: Record<string, string> = {
-  'Не курю': 'no', 'Курю': 'yes', 'Бросил(а)': 'quit',
-  'Низкая': 'light', 'Умеренная': 'moderate', 'Высокая': 'active',
-};
+const LEGACY_CODES = new Map<string, string>([
+  ['Не курю', 'no'], ['Курю', 'yes'], ['Бросил(а)', 'quit'],
+  ['Низкая', 'light'], ['Умеренная', 'moderate'], ['Высокая', 'active'],
+]);
+
+function toCode(value: string | undefined): string {
+  return value ? (LEGACY_CODES.get(value) ?? value) : '';
+}
 
 function toggleSet(prev: Set<string>, item: string): Set<string> {
   const next = new Set(prev);
@@ -111,8 +115,8 @@ export const MedicalHistoryPage: FC = () => {
         const allergyItems = (p.drug_allergies || '').split(',').map((s) => s.trim()).filter(Boolean);
         setAllergies(new Set(allergyItems.filter((a) => knownAllergies.has(a))));
         setAllergiesOther(allergyItems.filter((a) => !knownAllergies.has(a)).join(', '));
-        setSmoking(LEGACY_CODES[p.smoking || ''] || p.smoking || '');
-        setActivity(LEGACY_CODES[p.physical_activity || ''] || p.physical_activity || '');
+        setSmoking(toCode(p.smoking));
+        setActivity(toCode(p.physical_activity));
       })
       .catch(() => {
         setLoadFailed(true);
