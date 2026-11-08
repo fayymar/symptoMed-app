@@ -101,10 +101,15 @@ export const MedicalHistoryPage: FC = () => {
   // Подставляем то, что уже заполнено (в боте, на сайте или здесь раньше):
   // иначе сохранение пустой формы стёрло бы эти данные
   useEffect(() => {
+    // userId появляется не сразу (useUserId ждёт Telegram до ~5 секунд). Пока его
+    // нет, держим «Загрузка…»: иначе форма успела бы показаться пустой
     if (!userId) {
-      setLoading(false);
-      return;
+      const timer = setTimeout(() => setLoading(false), 6000);
+      return () => clearTimeout(timer);
     }
+    setLoading(true);
+    setLoadFailed(false);
+    setError('');
     getProfile(userId)
       .then((res) => {
         const p = res.profile;
@@ -127,7 +132,7 @@ export const MedicalHistoryPage: FC = () => {
 
   const handleSave = async () => {
     // Без загруженных данных сохранение пустой формы стёрло бы анамнез
-    if (loadFailed || !userId) {
+    if (loading || loadFailed || !userId) {
       setError('Не удалось загрузить сохранённые данные. Проверьте соединение и откройте экран заново.');
       return;
     }
