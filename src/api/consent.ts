@@ -7,7 +7,7 @@ import { apiFetch, hasSession, jsonHeaders } from './client';
  * services/consent.py) и сайтом (symed-web, src/lib/consent.ts). При изменении
  * текста повышайте версию во всех трёх местах.
  */
-export const CONSENT_VERSION = '2026-11-07';
+export const CONSENT_VERSION = '2026-11-08';
 
 export const PRIVACY_URL = 'https://symed.uz/privacy';
 
@@ -17,7 +17,7 @@ export const CONSENT_INTRO =
 
 export const CONSENT_POINTS = [
   'на обработку ваших персональных данных, включая данные о здоровье, чтобы подобрать вам врача-специалиста;',
-  'на хранение данных на защищённых серверах в Германии (ЕС);',
+  'на хранение данных на защищённых серверах в ЕС;',
   'на передачу симптомов, ответов на вопросы, возраста, пола и медицинского анамнеза — без имени и телефона — AI-сервисам в США для анализа.',
 ];
 
